@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.named-blade",
+  "name": "名刀·司命",
+  "note": "致命伤会被它拦下一次，然后进入很长的冷却。代价是一把刀一直压着你：生命上限和移速都降一截。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "self"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：常驻自我增益**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "form": "passive",
+  "_comment_form": "形态 = passive（常驻）：只有一段占位相（idle）、没有固有效果 —— 靠 onLethalDamage / onCast 的反应干活。\n\n⚠ 它现在**没有被任何术式引用**（那两份示范术式删了）。依据是机制本身（没有时间轴），不是\"被 auto 术式用到\"；探针 tech.named-blade 也确实写成 activation: 'auto'（tests/probes.ts），两边一致。",
+  "phases": [
+    {
+      "id": "idle",
+      "name": "常驻",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "none"
+    }
+  ],
+  "rules": [
+    {
+      "id": "r1",
+      "note": "致命伤：拦下这一下，然后进入长冷却",
+      "when": "onLethalDamage",
+      "if": [
+        {
+          "type": "not",
+          "of": [
+            {
+              "type": "hasStatus",
+              "who": "self",
+              "value": "status.namedBlade.spent"
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "payload": {
+            "kind": "attribute",
+            "path": "pipeline.cancelled",
+            "op": "set",
+            "value": {
+              "const": 1
+            }
+          }
+        },
+        {
+          "target": "self",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.namedBlade.invuln",
+              "name": "司命",
+              "tags": [
+                "buff"
+              ],
+              "duration": 1.5,
+              "vfx": "fx.invuln",
+              "removal": {
+                "expires": true
+              },
+              "hooks": [
+                {
+                  "stage": "intercept",
+                  "side": "target",
+                  "then": [
+                    {
+                      "payload": {
+                        "kind": "attribute",
+                        "path": "pipeline.cancelled",
+                        "op": "set",
+                        "value": {
+                          "const": 1
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "target": "self",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.namedBlade.spent",
+              "name": "司命·冷却",
+              "tags": [
+                "cooldown"
+              ],
+              "duration": 25,
+              "vfx": "fx.spent",
+              "removal": {
+                "expires": true
+              }
+            }
+          }
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "r2",
+      "note": "刀带着它，一直压着你",
+      "when": "onCast",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.namedBlade.burden",
+              "name": "司命·负重",
+              "tags": [
+                "debuff"
+              ],
+              "duration": -1,
+              "vfx": "fx.burden",
+              "removal": {
+                "onlyBy": [
+                  "tech.named-blade"
+                ],
+                "expires": false
+              },
+              "modifiers": [
+                {
+                  "path": "char.hp.max",
+                  "op": "mul",
+                  "value": {
+                    "const": 0.8
+                  }
+                },
+                {
+                  "path": "char.moveScale",
+                  "op": "mul",
+                  "value": {
+                    "const": 0.9
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "order": 1
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "被动",
+    "武器",
+    "保命"
+  ]
+}

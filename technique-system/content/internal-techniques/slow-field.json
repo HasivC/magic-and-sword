@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.slow-field",
+  "name": "迟滞场",
+  "note": "长在一块地上的减速场：进来被黏住，走出去就松开。",
+  "_comment": "⚠ 这个术式的 activation 是 auto —— 它是**场地自己的**常驻术式，\n不是给玩家按的。玩家按的是 tech.place-slow-field（放下它）。\n\n`mode: 'self'` 也是这个意思：场地的规则作用在**走进来的人**身上\n（`onEnter` 的规则把 ctx.target 设成那个人），不需要再去瞄准谁。\n真正决定「影响谁」的是 `valid`。",
+  "activation": "auto",
+  "skills": [
+    "skill.slow-field"
+  ],
+  "tags": [
+    "区域",
+    "控制"
+  ],
+  "kind": "magic"
+}

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.stealth",
+  "name": "潜行",
+  "note": "隐去身形，让别人锁定不了你。范围技能照样打得中 —— 隐形强在「找不到你」，不强在无敌。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "self"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**术式 tech.stealth**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "perception 的 setVisibility 模式。整个引擎里 visibility 一直是个**死字段**：status.ts 算出 visibilityOf()，但没有一个地方读它（连熔岩护甲那条 visibility: 1 都是空操作）。所以这个技能的意义不只是「多一个技能」，而是让那个字段第一次真的有用。",
+  "_comment_how": "它做的事就是给自己挂一个 visibility: 0 的状态。\n消费它的有两个地方，合起来才是一个完整的机制：\n  · sim 侧：findHostile 会跳过看不见的目标 —— 敌人**锁定不了**你\n  · 渲染侧：透明度跟着 visibility 走 —— 你看得见自己变淡了",
+  "_comment_counter": "⚠ 它是有反制的，而且反制就在同一个内容包里：「洞察」的 reveal 会把隐形状态**移除**。\n另外范围技能照样打得中 —— 隐形躲的是「锁定」，不是「判定」。\n这是有意的：隐形强在「找不到你」，不强在「无敌」。",
+  "phases": [
+    {
+      "id": "vanish",
+      "name": "前摇",
+      "duration": 0.3,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 20
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "gone",
+      "name": "后摇",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "vanish",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "perception",
+            "mode": "setVisibility",
+            "value": {
+              "const": 0
+            },
+            "duration": 5
+          }
+        }
+      ],
+      "note": "隐去身形，让别人锁定不了你"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "潜行",
+    "生存"
+  ],
+  "rules": []
+}

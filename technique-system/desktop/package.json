@@ -1,0 +1,49 @@
+{
+  "name": "magic-and-sword-desktop",
+  "version": "0.0.1",
+  "private": true,
+  "description": "术式系统 · 桌面壳（Electron）—— 把游戏装进一个自己的窗口，最后打成 .exe",
+  "main": "main.js",
+  "scripts": {
+    "build:assets": "node ../node_modules/typescript/bin/tsc -p tsconfig.json",
+    "start": "npm run build:assets && electron .",
+    "dist": "npm run build:assets && node pack.mjs",
+    "dist:portable": "npm run build:assets && electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "local.magic-and-sword",
+    "productName": "MagicAndSword",
+    "directories": {
+      "output": "out"
+    },
+    "files": [
+      "main.js",
+      "build/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../web",
+        "to": "web"
+      },
+      {
+        "from": "../content",
+        "to": "content"
+      },
+      {
+        "from": "../schema",
+        "to": "schema"
+      }
+    ],
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "MagicAndSword-${version}.exe"
+    }
+  }
+}

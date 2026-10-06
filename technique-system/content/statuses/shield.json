@@ -1,0 +1,23 @@
+{
+  "id": "status.shield",
+  "name": "护盾",
+
+  "_comment": "内容库里的第一个可复用状态。它原先内联在「灵光盾」那个技能里 —— 能跑，但有个隐藏耦合：裂魂的「命中时驱散护盾」按 id 引用它，于是**删掉灵光盾，裂魂就悬空了**。",
+
+  "_comment_why": "搬进状态库之后，定义和消费者彻底解耦：\n  · 灵光盾（skill.aegis）按 id 引用它\n  · 裂魂（skill.soul-rend）按 id 移除它\n两边都不再依赖「某个技能恰好也在内容库里」。\n\n（顺带一提：那种悬空**现在会被 checkStatusRefs 抓住** —— 这是刚补的加载期检查。但更好的做法是根本别产生它。）",
+
+  "_comment_tags": "⚠ shield 这个标签是**玩法的一部分**，不是装饰：\n裂魂的条件是 hasStatusTag(target, 'shield') —— 按标签匹配。\n所以以后新加的任何一种护盾（火盾、法盾、次数盾）只要打上 shield 标签，\n裂魂就会自动驱散它，不用回去改裂魂。",
+
+  "_comment_hook": "纯吸收型钩子：不写 then，池子就是它的全部效果。\n挡满 perStack 点伤害就碎。校验器专门放行了这一种（EMPTY_HOOK 那条错误的例外）。\n\nside 不写就是 'target' —— 护盾长在**挨打**的那一侧。\n写错成 'source' 的话，它会变成「我打人的时候挡伤害」，等于没有护盾。",
+
+  "tags": ["buff", "shield"],
+  "duration": 10,
+  "hooks": [
+    {
+      "stage": "absorb",
+      "absorb": { "mode": "damage", "perStack": 150 }
+    }
+  ],
+  "removal": { "expires": true },
+  "vfx": "fx.shield"
+}

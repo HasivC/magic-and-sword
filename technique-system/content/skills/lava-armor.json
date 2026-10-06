@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.lava-armor",
+  "name": "熔岩护甲",
+  "note": "穿上一层熔岩护甲：谁打你就烫回去。代价是穿着它要持续烧能量，身体也沉重、跑不快。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "self"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：给自己挂状态**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "phases": [
+    {
+      "id": "cast",
+      "name": "命中",
+      "duration": 0.5,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "damage"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "cast",
+      "note": "披上一层熔岩护甲：谁打你就烫回去",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.lava-armor",
+              "name": "熔岩护甲",
+              "tags": [
+                "buff"
+              ],
+              "duration": 10,
+              "vfx": "fx.lava-armor"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "ruleSlots": 5,
+  "tags": [
+    "防御",
+    "反伤"
+  ],
+  "rules": [
+    {
+      "id": "r2",
+      "note": "穿着它得一直烧能量",
+      "when": "onTick",
+      "every": 0.5,
+      "if": [
+        {
+          "type": "hasStatus",
+          "who": "self",
+          "value": "status.lava-armor"
+        }
+      ],
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "attribute",
+            "path": "char.energy.current",
+            "op": "add",
+            "value": {
+              "const": -3
+            }
+          }
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "r3",
+      "note": "被摸就烫回去",
+      "when": "onDamaged",
+      "if": [
+        {
+          "type": "hasStatus",
+          "who": "self",
+          "value": "status.lava-armor"
+        }
+      ],
+      "then": [
+        {
+          "delivery": {
+            "kind": "area",
+            "radius": 2.5
+          },
+          "target": {
+            "mode": "auto",
+            "valid": [
+              "enemy"
+            ]
+          },
+          "payload": {
+            "kind": "damage",
+            "amount": {
+              "const": 30
+            },
+            "damageType": "fire"
+          }
+        }
+      ],
+      "order": 1
+    },
+    {
+      "id": "r4",
+      "note": "沉重：跑不快",
+      "when": "onCast",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.lava-armor.heavy",
+              "name": "熔岩护甲·沉重",
+              "tags": [
+                "debuff"
+              ],
+              "duration": 10,
+              "modifiers": [
+                {
+                  "path": "char.speed",
+                  "op": "mul",
+                  "value": {
+                    "const": 0.8
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "order": 2
+    },
+    {
+      "id": "r5",
+      "note": "代价：生命上限被吃掉一块",
+      "when": "onCast",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.lava-armor.frailty",
+              "name": "熔岩护甲·焦灼",
+              "tags": [
+                "debuff"
+              ],
+              "duration": 10,
+              "modifiers": [
+                {
+                  "path": "char.hp.max",
+                  "op": "mul",
+                  "value": {
+                    "const": 0.9
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "order": 3
+    }
+  ]
+}

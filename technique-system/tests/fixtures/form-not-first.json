@@ -1,0 +1,11 @@
+{
+  "_comment": "故意写坏的：release（蓄力放开）本身和蓄力技能是相容的，但「贯日」被排在「裂地斩」**后面** —— 蓄力 / 持续技能必须是序列的第一个。要报 FORM_NOT_FIRST，而且**不该**报 FORM_INCOMPATIBLE（那正是这两条规则的分工）。",
+
+  "schemaVersion": 1,
+  "id": "tech.form-not-first",
+  "name": "故意写坏的蓄力不在最前",
+  "kind": "magic",
+  "activation": "release",
+  "targeting": { "mode": "directional", "valid": ["enemy"] },
+  "skills": ["skill.cleave", "skill.charged-laser"]
+}

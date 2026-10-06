@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.hunter-instinct",
+  "name": "猎手直觉",
+  "note": "常驻被动：警觉会压低你的生命上限并持续耗神，换来的是暴击时回一点血。开它就是把自己押在暴击上。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "self"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：常驻自我增益**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "form": "passive",
+  "_comment_form": "形态 = passive（常驻）：时间轴里只有一段占位相（idle），没有固有效果 —— 全靠 onCast / onCrit 的反应规则。\n\n⚠ 它现在**没有被任何术式引用**（出厂那份同名示范删掉了，玩家要自己编一份术式把它装上去才生效，见 arena.json）。所以这一条的依据是**机制本身**（没有时间轴），不是\"被 auto 术式用到\" —— 后者对未被引用的技能不成立。判断题干在 docs/log/2026-09-27-45-skill-form.md。",
+  "_comment": "一个被动把两个零内容的时机一起补上：onCrit 和 onLowHp。\n整个引擎里这两个时机都是「有人读、没人写」—— onCrit 甚至更糟，\n因为暴击本身也不存在（CRIT_TAG 有地方读，没地方写）。",
+  "_comment_cost": "⚠ 被动的代价只能这么付。\n\n   常驻技能没有「按一下」这一刻，所以它既没有真的能量消耗，也没有真的冷却 ——\n   挂在 onCrit / onLowHp 上的钩子不需要任何冷却就会触发。\n   在 cost 里写 cooldown 只会在账上多出点数，**却拦不住任何东西**，\n   那是假代价。\n\n   名刀司命定下的办法：用一条 onCast 规则给自己挂一个**永久负重**。\n   onCast 在技能挂上时跑一次（见 cast.ts 的 setTechniqueActive），\n   所以这条负重是真的会落地、真的会疼的。",
+  "_comment_crit": "⚠ 暴击要能发生，得有人给 char.critRate。这个技能自己不给 ——\n它只负责「暴击之后干什么」。暴击率写在场景里（arena.json 的 char.critRate）：\n它是角色属性，不是某个技能的附属。",
+  "_comment_lowhp": "onLowHp 的语义是「血量**跨过** 30% 的那一瞬间」，不是「低于 30% 就一直触发」。\n后者会让「残血获得护盾」变成「每次挨打都白送一个护盾」。",
+  "phases": [
+    {
+      "id": "idle",
+      "name": "常驻",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "none"
+    }
+  ],
+  "rules": [
+    {
+      "id": "r1",
+      "note": "警觉是要耗神的：生命上限被压掉一块",
+      "when": "onCast",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.hunterInstinct.burden",
+              "name": "警觉·耗神",
+              "tags": [
+                "debuff"
+              ],
+              "duration": -1,
+              "removal": {
+                "onlyBy": [
+                  "tech.hunter-instinct"
+                ],
+                "expires": false
+              },
+              "modifiers": [
+                {
+                  "path": "char.hp.max",
+                  "op": "mul",
+                  "value": {
+                    "const": 0.9
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "r2",
+      "note": "暴击就回一点血",
+      "when": "onCrit",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "heal",
+            "amount": {
+              "const": 10
+            }
+          }
+        }
+      ],
+      "order": 1
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "被动",
+    "生存"
+  ]
+}

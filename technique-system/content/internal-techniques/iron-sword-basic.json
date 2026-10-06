@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.iron-sword-basic",
+  "name": "铁剑·基本式",
+  "_comment": "**开局那把剑的左键**：只有一段横砍。\n\n⚠ 和长剑（tech.longsword-basic）的差别不在技能上 —— 两边用的都是同一份\n横砍模板 —— 而在**有哪些序列**：铁剑只有一段，长剑是横砍 → 刺击。\n\n所以「换武器」换掉的是三件事：属性（伤害/射程/攻速）、\n能走的招式（序列）、以及铭刻的魔法术式槽。",
+  "activation": "press",
+  "_comment_sequences": "⚠ 2026-09-21（日志 46）序列**内联**了：以前这里是\n`[\"tech.ws-slash\"]`（一段**引用另一份术式**），现在这一段**自己带 `skills`**，\n那份子术式文件删掉了。⚠ `id` 显式写成旧 id —— **冷却键就是它**（见\n`longsword-basic.json` 里 `_comment_sequences` 那段，两份同一条规矩）。\n⚠ **这一段和它的瞄准现在分住两处**（2026-09-21 日志 47）：段只带 `skills`，\n瞄准在**技能**上（`skill.ws-slash` 的 `targeting`）—— 编译时由\n`compile.ts` 的 `targetingOfChain` 从技能身上取进编译产物，\n所以下面那一段里**没有** `targeting`（校验器会对着写回去的报错）。",
+  "sequences": [
+    {
+      "id": "tech.ws-slash",
+      "name": "横砍",
+      "skills": [
+        "skill.ws-slash"
+      ]
+    }
+  ],
+  "sequenceTimeout": 1,
+  "tags": [
+    "武器术式",
+    "序列"
+  ],
+  "kind": "weapon"
+}

@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.insight",
+  "name": "洞察",
+  "note": "扫一圈：把藏起来的敌人揪出来，并给看到的人打上标记。这是潜行的反制，也是「猎杀」的前置。",
+  "targeting": {
+    "mode": "directional",
+    "valid": [
+      "enemy"
+    ],
+    "range": 8
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：区域侦察**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "perception 的 reveal + mark 两个模式。它是「潜行」的**反制**：把隐形状态直接移除。",
+  "_comment_reveal": "⚠ reveal 只能是「移除隐形状态」，不能是「再挂一个可见的状态」。\nvisibilityOf 取的是最小值 —— 只要隐形状态还在，最小值就还是 0，\n挂一个 visibility: 1 上去一点用都没有。这个坑写的时候踩过一次，测试里钉住了。",
+  "_comment_mark": "mark 只打一个带 marked 标签的状态，**数值上什么都不做**。\n它的价值全在被别的规则消费 —— 「猎杀」就是那个消费者（对带 marked 的目标打得更痛）。\n所以这两个技能是一对：一个负责认出人，一个负责利用这件事。",
+  "phases": [
+    {
+      "id": "scan",
+      "name": "前摇",
+      "duration": 0.3,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 10
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "lock",
+      "name": "后摇",
+      "duration": 0.2,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "scan",
+      "then": [
+        {
+          "_comment_target": "⚠ target: 'hit' 必须显式写。schema 说不写就是 'hit'（对面那个），\n引擎也这么做；但定价器有条启发式「没写 target 且时机不是 onHit → 当成给自己上的」。\n不写的话，一个「把敌人揪出来」的动作会被按「给自己显形」计价，符号整个反掉。\n这是第三次踩它了（前两次：亡灵诅咒、猎杀的标记）。",
+          "target": "hit",
+          "delivery": {
+            "kind": "area",
+            "radius": 12
+          },
+          "payload": {
+            "kind": "perception",
+            "mode": "reveal"
+          }
+        }
+      ],
+      "note": "把藏起来的人揪出来"
+    },
+    {
+      "id": "e2",
+      "at": "scan",
+      "then": [
+        {
+          "target": "hit",
+          "delivery": {
+            "kind": "area",
+            "radius": 12
+          },
+          "payload": {
+            "kind": "perception",
+            "mode": "mark",
+            "duration": 10
+          }
+        }
+      ],
+      "note": "顺便给看到的人打个标记"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "侦察",
+    "辅助"
+  ],
+  "rules": []
+}

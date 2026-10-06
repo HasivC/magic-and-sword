@@ -1,0 +1,893 @@
+﻿术式系统 · 点表定价空白表 —— 给【用户】（设计方）填,,,,,,,
+这张表只有设计方填；玩家改不了它。玩家能做的只有「选取值」，一个技能的点数是这张表查出来的数相加的结果。,,,,,,,
+★你要填的点数★ 那一列：填【整数】。0 = 不收费（就是现在这样、白送）；负数 = 花钱（越负越贵）；正数 = 给额度。不填 = 保持现在的 0。,,,,,,,
+? 备注里写着「出厂值那一格」的行，★那一格必须留 0、不许改（出厂值自己减自己 = 0，这是引擎的硬规矩）。,,,,,,,
+连续量（等待秒数 / 追踪的转速与射程 / 弹射的次数与衰减 / 排布的半径与三个角 / 份数 / 实体预设的数值 / 状态的持续与吸收池 / 武器属性）：**已经「定死档位」** —— 下面每个变量都是「一行一个档位」，不再有自由滑块、也不再写「范围」。
+⚠ 每个变量里**写着内容当前值的那个档位** = 出厂值（中性档），那一行的 ★ 必须留 0、不许改。⚠ 档位表本身也是设计，用户会像改数一样改它（草稿在 content/balance.json 的 tierDrafts）。
+一行 = 一个技能的一个变量（或一个零件/预设的参数）的一个取值。取值 = 玩家能选的那一档；现在是多少 = 今天账上这一格的点数。,,,,,,,
+A 类 = 点表里「整列都是 0」的变量（93 个）；B 类 = 压根不在点表里的东西（屏障开关、零件参数、武器属性……）。,,,,,,,
+? 其中 58 个「占用施法者」变量按用户定义是引擎硬规矩、本来就该 0 ? 单独一节，标着「不用填」。,,,,,,,
+怎么打开：双击本文件（Excel 认 UTF-8 BOM）；万一中文是乱码，用 Excel 的「数据 → 从文本/CSV」导入并选 UTF-8。,,,,,,,
+? 这是一张空白表：不改任何数、也进不了引擎；填完之后由设计方转成 content/balance.json 的 lookupTable。,,,,,,,
+,,,,,,,
+=== A 类：点表里整列都是 0 的变量（93 个 · 今天白送，等你定价）===,,,,,,,
+,,,,,,,
+=== 破军突刺 skill.armor-pierce ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 5 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+破军突刺,skill.armor-pierce,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.2,0,2,这一格现在 0 点（白送）
+破军突刺,skill.armor-pierce,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.4,0,1,这一格现在 0 点（白送）
+破军突刺,skill.armor-pierce,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.6,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+破军突刺,skill.armor-pierce,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.8,0,-1,这一格现在 0 点（白送）
+破军突刺,skill.armor-pierce,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,1.2,0,-2,这一格现在 0 点（白送）
+,,,,,,,
+=== 屏障 skill.barrier ===,,,,,,,
+这个技能有 2 个变量整列都是 0，一共 9 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+屏障,skill.barrier,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,-4,0,,这一格现在 0 点（白送）
+屏障,skill.barrier,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,-3,0,,这一格现在 0 点（白送）
+屏障,skill.barrier,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,0,0,,这一格现在 0 点（白送）
+屏障,skill.barrier,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,1,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+屏障,skill.barrier,前摇 · 召唤 · 飞行时间（s）,effect.0.then.0.payload.lifetime,0.5,0,,这一格现在 0 点（白送）
+屏障,skill.barrier,前摇 · 召唤 · 飞行时间（s）,effect.0.then.0.payload.lifetime,1,0,,这一格现在 0 点（白送）
+屏障,skill.barrier,前摇 · 召唤 · 飞行时间（s）,effect.0.then.0.payload.lifetime,1.5,0,,这一格现在 0 点（白送）
+屏障,skill.barrier,前摇 · 召唤 · 飞行时间（s）,effect.0.then.0.payload.lifetime,3,0,,这一格现在 0 点（白送）
+屏障,skill.barrier,前摇 · 召唤 · 飞行时间（s）,effect.0.then.0.payload.lifetime,8,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+,,,,,,,
+=== 血祭斩 skill.blood-offering ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 5 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+血祭斩,skill.blood-offering,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,45,0,2,这一格现在 0 点（白送）
+血祭斩,skill.blood-offering,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,90,0,1,这一格现在 0 点（白送）
+血祭斩,skill.blood-offering,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,120,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+血祭斩,skill.blood-offering,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,180,0,-1,这一格现在 0 点（白送）
+血祭斩,skill.blood-offering,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,360,0,-2,这一格现在 0 点（白送）
+,,,,,,,
+=== 血契 skill.blood-pact ===,,,,,,,
+这个技能有 2 个变量整列都是 0，一共 18 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+血契,skill.blood-pact,血量过低时 · 改属性 · 血契（血契）,rules.0.then.0.payload.value.const,1,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,血量过低时 · 改属性 · 血契（血契）,rules.0.then.0.payload.value.const,2,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,血量过低时 · 改属性 · 血契（血契）,rules.0.then.0.payload.value.const,3,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+血契,skill.blood-pact,血量过低时 · 改属性 · 血契（血契）,rules.0.then.0.payload.value.const,5,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,血量过低时 · 改属性 · 血契（血契）,rules.0.then.0.payload.value.const,8,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,血量过低时 · 改属性 · 血契（血契）,rules.0.then.0.payload.value.const,15,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,血量过低时 · 改属性 · 血契（血契）,rules.0.then.0.payload.value.const,30,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,血量过低时 · 改属性 · 血契（血契）,rules.0.then.0.payload.value.const,60,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,血量过低时 · 改属性 · 血契（血契）,rules.0.then.0.payload.value.const,100,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,身上新挂上状态时 · 改属性 · 血契（血契）,rules.1.then.0.payload.value.const,1,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,身上新挂上状态时 · 改属性 · 血契（血契）,rules.1.then.0.payload.value.const,2,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+血契,skill.blood-pact,身上新挂上状态时 · 改属性 · 血契（血契）,rules.1.then.0.payload.value.const,3,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,身上新挂上状态时 · 改属性 · 血契（血契）,rules.1.then.0.payload.value.const,5,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,身上新挂上状态时 · 改属性 · 血契（血契）,rules.1.then.0.payload.value.const,8,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,身上新挂上状态时 · 改属性 · 血契（血契）,rules.1.then.0.payload.value.const,15,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,身上新挂上状态时 · 改属性 · 血契（血契）,rules.1.then.0.payload.value.const,30,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,身上新挂上状态时 · 改属性 · 血契（血契）,rules.1.then.0.payload.value.const,60,0,,这一格现在 0 点（白送）
+血契,skill.blood-pact,身上新挂上状态时 · 改属性 · 血契（血契）,rules.1.then.0.payload.value.const,100,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 贯日 skill.charged-laser ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 5 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+贯日,skill.charged-laser,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.2,0,,这一格现在 0 点（白送）
+贯日,skill.charged-laser,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.4,0,,这一格现在 0 点（白送）
+贯日,skill.charged-laser,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.6,0,,这一格现在 0 点（白送）
+贯日,skill.charged-laser,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.8,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+贯日,skill.charged-laser,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,1.2,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 裂地斩 skill.cleave ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 5 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+裂地斩,skill.cleave,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,45,0,,这一格现在 0 点（白送）
+裂地斩,skill.cleave,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,90,0,,这一格现在 0 点（白送）
+裂地斩,skill.cleave,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,120,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+裂地斩,skill.cleave,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,180,0,,这一格现在 0 点（白送）
+裂地斩,skill.cleave,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,360,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 寒冰锁 skill.frost-lock ===,,,,,,,
+这个技能有 3 个变量整列都是 0，一共 15 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+寒冰锁,skill.frost-lock,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,4,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,8,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,12,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+寒冰锁,skill.frost-lock,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,16,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,24,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,0.5,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,1,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,1.5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+寒冰锁,skill.frost-lock,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,3,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,8,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,0.5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+寒冰锁,skill.frost-lock,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,1,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,2.5,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,4,0,,这一格现在 0 点（白送）
+寒冰锁,skill.frost-lock,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,6,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 猎杀 skill.hunt ===,,,,,,,
+这个技能有 3 个变量整列都是 0，一共 15 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+猎杀,skill.hunt,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,4,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,8,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,12,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+猎杀,skill.hunt,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,16,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,24,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,0.5,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,1,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,1.5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+猎杀,skill.hunt,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,3,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,8,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,0.5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+猎杀,skill.hunt,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,1,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,2.5,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,4,0,,这一格现在 0 点（白送）
+猎杀,skill.hunt,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,6,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 无下限 skill.infinity ===,,,,,,,
+这个技能有 2 个变量整列都是 0，一共 12 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+无下限,skill.infinity,每 0.25 秒 · 间隔（s）,rules.0.every,0.1,0,,这一格现在 0 点（白送）
+无下限,skill.infinity,每 0.25 秒 · 间隔（s）,rules.0.every,0.25,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+无下限,skill.infinity,每 0.25 秒 · 间隔（s）,rules.0.every,0.5,0,,这一格现在 0 点（白送）
+无下限,skill.infinity,每 0.25 秒 · 间隔（s）,rules.0.every,1,0,,这一格现在 0 点（白送）
+无下限,skill.infinity,每 0.25 秒 · 间隔（s）,rules.0.every,2,0,,这一格现在 0 点（白送）
+无下限,skill.infinity,每 0.25 秒 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,-1,0,,这一格现在 0 点（白送）
+无下限,skill.infinity,每 0.25 秒 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,0.5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+无下限,skill.infinity,每 0.25 秒 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,1.5,0,,这一格现在 0 点（白送）
+无下限,skill.infinity,每 0.25 秒 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,3,0,,这一格现在 0 点（白送）
+无下限,skill.infinity,每 0.25 秒 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,5,0,,这一格现在 0 点（白送）
+无下限,skill.infinity,每 0.25 秒 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,10,0,,这一格现在 0 点（白送）
+无下限,skill.infinity,每 0.25 秒 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,25,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 洞察 skill.insight ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 7 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+洞察,skill.insight,前摇 · 感知 · 持续（s）,effect.1.then.0.payload.duration,-1,0,,这一格现在 0 点（白送）
+洞察,skill.insight,前摇 · 感知 · 持续（s）,effect.1.then.0.payload.duration,0.5,0,,这一格现在 0 点（白送）
+洞察,skill.insight,前摇 · 感知 · 持续（s）,effect.1.then.0.payload.duration,1.5,0,,这一格现在 0 点（白送）
+洞察,skill.insight,前摇 · 感知 · 持续（s）,effect.1.then.0.payload.duration,3,0,,这一格现在 0 点（白送）
+洞察,skill.insight,前摇 · 感知 · 持续（s）,effect.1.then.0.payload.duration,5,0,,这一格现在 0 点（白送）
+洞察,skill.insight,前摇 · 感知 · 持续（s）,effect.1.then.0.payload.duration,10,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+洞察,skill.insight,前摇 · 感知 · 持续（s）,effect.1.then.0.payload.duration,25,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 背水 · 撑盾 skill.last-stand-shield ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 7 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+背水 · 撑盾,skill.last-stand-shield,后摇 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,-1,0,,这一格现在 0 点（白送）
+背水 · 撑盾,skill.last-stand-shield,后摇 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,0.5,0,,这一格现在 0 点（白送）
+背水 · 撑盾,skill.last-stand-shield,后摇 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,1.5,0,,这一格现在 0 点（白送）
+背水 · 撑盾,skill.last-stand-shield,后摇 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,3,0,,这一格现在 0 点（白送）
+背水 · 撑盾,skill.last-stand-shield,后摇 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+背水 · 撑盾,skill.last-stand-shield,后摇 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,10,0,,这一格现在 0 点（白送）
+背水 · 撑盾,skill.last-stand-shield,后摇 · 挂状态 · 持续（s）,rules.0.then.0.payload.inline.duration,25,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 熔岩护甲 skill.lava-armor ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 7 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+熔岩护甲,skill.lava-armor,命中 · 挂状态 · 持续（s）,effect.0.then.0.payload.inline.duration,-1,0,,这一格现在 0 点（白送）
+熔岩护甲,skill.lava-armor,命中 · 挂状态 · 持续（s）,effect.0.then.0.payload.inline.duration,0.5,0,,这一格现在 0 点（白送）
+熔岩护甲,skill.lava-armor,命中 · 挂状态 · 持续（s）,effect.0.then.0.payload.inline.duration,1.5,0,,这一格现在 0 点（白送）
+熔岩护甲,skill.lava-armor,命中 · 挂状态 · 持续（s）,effect.0.then.0.payload.inline.duration,3,0,,这一格现在 0 点（白送）
+熔岩护甲,skill.lava-armor,命中 · 挂状态 · 持续（s）,effect.0.then.0.payload.inline.duration,5,0,,这一格现在 0 点（白送）
+熔岩护甲,skill.lava-armor,命中 · 挂状态 · 持续（s）,effect.0.then.0.payload.inline.duration,10,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+熔岩护甲,skill.lava-armor,命中 · 挂状态 · 持续（s）,effect.0.then.0.payload.inline.duration,25,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 魔法飞弹 skill.magic-bolt ===,,,,,,,
+这个技能有 3 个变量整列都是 0，一共 15 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,4,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,8,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,12,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,16,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 速度（m/s）,effect.0.then.0.delivery.speed,24,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,0.5,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,1,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,1.5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,3,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 飞行时间（s）,effect.0.then.0.delivery.lifetime,8,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,0.5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,1,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,2.5,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,4,0,,这一格现在 0 点（白送）
+魔法飞弹,skill.magic-bolt,命中 · 伤害 · 半径（m）,effect.0.then.0.delivery.radius,6,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 标记 skill.mark ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 7 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+标记,skill.mark,前摇 · 感知 · 持续（s）,effect.0.then.0.payload.duration,-1,0,,这一格现在 0 点（白送）
+标记,skill.mark,前摇 · 感知 · 持续（s）,effect.0.then.0.payload.duration,0.5,0,,这一格现在 0 点（白送）
+标记,skill.mark,前摇 · 感知 · 持续（s）,effect.0.then.0.payload.duration,1.5,0,,这一格现在 0 点（白送）
+标记,skill.mark,前摇 · 感知 · 持续（s）,effect.0.then.0.payload.duration,3,0,,这一格现在 0 点（白送）
+标记,skill.mark,前摇 · 感知 · 持续（s）,effect.0.then.0.payload.duration,5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+标记,skill.mark,前摇 · 感知 · 持续（s）,effect.0.then.0.payload.duration,10,0,,这一格现在 0 点（白送）
+标记,skill.mark,前摇 · 感知 · 持续（s）,effect.0.then.0.payload.duration,25,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 名刀·司命 skill.named-blade ===,,,,,,,
+这个技能有 4 个变量整列都是 0，一共 22 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+名刀·司命,skill.named-blade,受到致命伤时 · 改属性 · 这一下的数值,rules.0.then.0.payload.value.const,-4,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 改属性 · 这一下的数值,rules.0.then.0.payload.value.const,-3,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 改属性 · 这一下的数值,rules.0.then.0.payload.value.const,0,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 改属性 · 这一下的数值,rules.0.then.0.payload.value.const,1,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.1.payload.inline.duration,-1,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.1.payload.inline.duration,0.5,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.1.payload.inline.duration,1.5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.1.payload.inline.duration,3,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.1.payload.inline.duration,5,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.1.payload.inline.duration,10,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.1.payload.inline.duration,25,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 拦截阶段 · 改属性 · 这一下的数值,rules.0.then.1.payload.inline.hooks.0.then.0.payload.value.const,-4,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 拦截阶段 · 改属性 · 这一下的数值,rules.0.then.1.payload.inline.hooks.0.then.0.payload.value.const,-3,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 拦截阶段 · 改属性 · 这一下的数值,rules.0.then.1.payload.inline.hooks.0.then.0.payload.value.const,0,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 拦截阶段 · 改属性 · 这一下的数值,rules.0.then.1.payload.inline.hooks.0.then.0.payload.value.const,1,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.2.payload.inline.duration,-1,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.2.payload.inline.duration,0.5,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.2.payload.inline.duration,1.5,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.2.payload.inline.duration,3,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.2.payload.inline.duration,5,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.2.payload.inline.duration,10,0,,这一格现在 0 点（白送）
+名刀·司命,skill.named-blade,受到致命伤时 · 挂状态 · 持续（s）,rules.0.then.2.payload.inline.duration,25,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+,,,,,,,
+=== 布场 skill.place-slow-field ===,,,,,,,
+这个技能有 2 个变量整列都是 0，一共 9 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+布场,skill.place-slow-field,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,-4,0,,这一格现在 0 点（白送）
+布场,skill.place-slow-field,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,-3,0,,这一格现在 0 点（白送）
+布场,skill.place-slow-field,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,0,0,,这一格现在 0 点（白送）
+布场,skill.place-slow-field,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,1,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+布场,skill.place-slow-field,前摇 · 召唤 · 飞行时间（s）,effect.0.then.0.payload.lifetime,0.5,0,,这一格现在 0 点（白送）
+布场,skill.place-slow-field,前摇 · 召唤 · 飞行时间（s）,effect.0.then.0.payload.lifetime,1,0,,这一格现在 0 点（白送）
+布场,skill.place-slow-field,前摇 · 召唤 · 飞行时间（s）,effect.0.then.0.payload.lifetime,1.5,0,,这一格现在 0 点（白送）
+布场,skill.place-slow-field,前摇 · 召唤 · 飞行时间（s）,effect.0.then.0.payload.lifetime,3,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+布场,skill.place-slow-field,前摇 · 召唤 · 飞行时间（s）,effect.0.then.0.payload.lifetime,8,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 亡灵复生 skill.raise-dead ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 4 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+亡灵复生,skill.raise-dead,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,-4,0,,这一格现在 0 点（白送）
+亡灵复生,skill.raise-dead,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,-3,0,,这一格现在 0 点（白送）
+亡灵复生,skill.raise-dead,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,0,0,,这一格现在 0 点（白送）
+亡灵复生,skill.raise-dead,前摇 · 召唤 · 数量,effect.0.then.0.payload.count,1,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+,,,,,,,
+=== 裂魂 skill.soul-rend ===,,,,,,,
+这个技能有 3 个变量整列都是 0，一共 16 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+裂魂,skill.soul-rend,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.2,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.4,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.6,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+裂魂,skill.soul-rend,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.8,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,1.2,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,击杀时 · 改属性 · 冷却（s）,rules.1.then.0.payload.value.const,-4,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,击杀时 · 改属性 · 冷却（s）,rules.1.then.0.payload.value.const,-3,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,击杀时 · 改属性 · 冷却（s）,rules.1.then.0.payload.value.const,0,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+裂魂,skill.soul-rend,击杀时 · 改属性 · 冷却（s）,rules.1.then.0.payload.value.const,1,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,命中时 · 挂状态 · 持续（s）,rules.2.then.0.payload.inline.duration,-1,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,命中时 · 挂状态 · 持续（s）,rules.2.then.0.payload.inline.duration,0.5,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,命中时 · 挂状态 · 持续（s）,rules.2.then.0.payload.inline.duration,1.5,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,命中时 · 挂状态 · 持续（s）,rules.2.then.0.payload.inline.duration,3,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,命中时 · 挂状态 · 持续（s）,rules.2.then.0.payload.inline.duration,5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+裂魂,skill.soul-rend,命中时 · 挂状态 · 持续（s）,rules.2.then.0.payload.inline.duration,10,0,,这一格现在 0 点（白送）
+裂魂,skill.soul-rend,命中时 · 挂状态 · 持续（s）,rules.2.then.0.payload.inline.duration,25,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 横砍 skill.ws-slash ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 5 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+横砍,skill.ws-slash,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,45,0,,这一格现在 0 点（白送）
+横砍,skill.ws-slash,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,90,0,,这一格现在 0 点（白送）
+横砍,skill.ws-slash,第 1 段「前摇」：时长（秒）,skill.ws-slash.phases.0.duration,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+横砍,skill.ws-slash,第 1 段「前摇」：时长（秒）,skill.ws-slash.phases.0.duration,0.1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+横砍,skill.ws-slash,第 1 段「前摇」：时长（秒）,skill.ws-slash.phases.0.duration,0.15,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容里现在写的就是 0.15 秒 —— ⚠ 它以前**不在点表上**（编辑器只能插一格 offGrid，拖走就回不来），这一片把它请上格子
+横砍,skill.ws-slash,第 1 段「前摇」：时长（秒）,skill.ws-slash.phases.0.duration,0.2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+横砍,skill.ws-slash,第 1 段「前摇」：时长（秒）,skill.ws-slash.phases.0.duration,0.25,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+横砍,skill.ws-slash,第 1 段「前摇」：时长（秒）,skill.ws-slash.phases.0.duration,0.3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+横砍,skill.ws-slash,第 1 段「前摇」：时长（秒）,skill.ws-slash.phases.0.duration,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+横砍,skill.ws-slash,第 1 段「前摇」：时长（秒）,skill.ws-slash.phases.0.duration,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+横砍,skill.ws-slash,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,120,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+横砍,skill.ws-slash,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,180,0,,这一格现在 0 点（白送）
+横砍,skill.ws-slash,命中 · 伤害 · 张角（°）,effect.0.then.0.delivery.angle,360,0,,这一格现在 0 点（白送）
+,,,,,,,
+=== 刺击 skill.ws-thrust ===,,,,,,,
+这个技能有 1 个变量整列都是 0，一共 6 行要你填。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+刺击,skill.ws-thrust,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.2,0,,这一格现在 0 点（白送）
+刺击,skill.ws-thrust,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.4,0,,这一格现在 0 点（白送）
+刺击,skill.ws-thrust,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.5,0,0（锁定，不许改）,? 出厂值那一格：必须留 0，不许改
+刺击,skill.ws-thrust,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.6,0,,这一格现在 0 点（白送）
+刺击,skill.ws-thrust,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,0.8,0,,这一格现在 0 点（白送）
+刺击,skill.ws-thrust,命中 · 伤害 · 宽度（m）,effect.0.then.0.delivery.width,1.2,0,,这一格现在 0 点（白送）
+,,,,,,,
+刺击,skill.ws-thrust,第 1 段「前摇」：时长（秒）,skill.ws-thrust.phases.0.duration,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+刺击,skill.ws-thrust,第 1 段「前摇」：时长（秒）,skill.ws-thrust.phases.0.duration,0.1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+刺击,skill.ws-thrust,第 1 段「前摇」：时长（秒）,skill.ws-thrust.phases.0.duration,0.15,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容里现在写的就是 0.15 秒 —— ⚠ 它以前**不在点表上**（编辑器只能插一格 offGrid），这一片把它请上格子
+刺击,skill.ws-thrust,第 1 段「前摇」：时长（秒）,skill.ws-thrust.phases.0.duration,0.2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+刺击,skill.ws-thrust,第 1 段「前摇」：时长（秒）,skill.ws-thrust.phases.0.duration,0.25,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+刺击,skill.ws-thrust,第 1 段「前摇」：时长（秒）,skill.ws-thrust.phases.0.duration,0.3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+刺击,skill.ws-thrust,第 1 段「前摇」：时长（秒）,skill.ws-thrust.phases.0.duration,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+刺击,skill.ws-thrust,第 1 段「前摇」：时长（秒）,skill.ws-thrust.phases.0.duration,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.15（s）
+刺击,skill.ws-thrust,第 3 段「后摇」：时长（秒）,skill.ws-thrust.phases.2.duration,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.25（s）
+刺击,skill.ws-thrust,第 3 段「后摇」：时长（秒）,skill.ws-thrust.phases.2.duration,0.1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.25（s）
+刺击,skill.ws-thrust,第 3 段「后摇」：时长（秒）,skill.ws-thrust.phases.2.duration,0.15,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.25（s）
+刺击,skill.ws-thrust,第 3 段「后摇」：时长（秒）,skill.ws-thrust.phases.2.duration,0.2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.25（s）
+刺击,skill.ws-thrust,第 3 段「后摇」：时长（秒）,skill.ws-thrust.phases.2.duration,0.25,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容里现在写的就是 0.25 秒 —— ⚠ 它以前**不在点表上**（编辑器只能插一格 offGrid），这一片把它请上格子
+刺击,skill.ws-thrust,第 3 段「后摇」：时长（秒）,skill.ws-thrust.phases.2.duration,0.3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.25（s）
+刺击,skill.ws-thrust,第 3 段「后摇」：时长（秒）,skill.ws-thrust.phases.2.duration,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.25（s）
+刺击,skill.ws-thrust,第 3 段「后摇」：时长（秒）,skill.ws-thrust.phases.2.duration,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.25（s）
+=== ? 不用填 · 占用施法者（引擎硬规矩，本来就该 0）· 58 个变量 · 116 行 ===,,,,,,,
+这一组不用填：按用户定义，「占用施法者」是引擎硬规矩，它的点数本来就该是 0。列出来只是为了让你看见它们在哪、别去动它们。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+灵光盾,skill.aegis,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+灵光盾,skill.aegis,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+灵光盾,skill.aegis,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+灵光盾,skill.aegis,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+破军突刺,skill.armor-pierce,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+破军突刺,skill.armor-pierce,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+破军突刺,skill.armor-pierce,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+破军突刺,skill.armor-pierce,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+破军突刺,skill.armor-pierce,第 3 段「后摇」：占用施法者（持续技）,@占用施法者.2,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+破军突刺,skill.armor-pierce,第 3 段「后摇」：占用施法者（持续技）,@占用施法者.2,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+屏障,skill.barrier,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+屏障,skill.barrier,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+屏障,skill.barrier,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+屏障,skill.barrier,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+瞬影,skill.blink,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+瞬影,skill.blink,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+瞬影,skill.blink,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+瞬影,skill.blink,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+血祭斩,skill.blood-offering,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+血祭斩,skill.blood-offering,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+血祭斩,skill.blood-offering,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+血祭斩,skill.blood-offering,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+血契,skill.blood-pact,第 1 段「常驻」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+血契,skill.blood-pact,第 1 段「常驻」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+突进,skill.charge-dash,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+突进,skill.charge-dash,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+突进,skill.charge-dash,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+突进,skill.charge-dash,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+贯日,skill.charged-laser,第 1 段「蓄力」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+贯日,skill.charged-laser,第 1 段「蓄力」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+贯日,skill.charged-laser,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+贯日,skill.charged-laser,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+策反,skill.charm,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+策反,skill.charm,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+策反,skill.charm,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+策反,skill.charm,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+裂地斩,skill.cleave,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+裂地斩,skill.cleave,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+裂地斩,skill.cleave,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+裂地斩,skill.cleave,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+裂地斩,skill.cleave,第 3 段「后摇」：占用施法者（持续技）,@占用施法者.2,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+裂地斩,skill.cleave,第 3 段「后摇」：占用施法者（持续技）,@占用施法者.2,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+亡灵诅咒,skill.curse-of-undead,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+亡灵诅咒,skill.curse-of-undead,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+亡灵诅咒,skill.curse-of-undead,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+亡灵诅咒,skill.curse-of-undead,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+火墙,skill.flame-wall,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+火墙,skill.flame-wall,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+火墙,skill.flame-wall,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+火墙,skill.flame-wall,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+寒冰锁,skill.frost-lock,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+寒冰锁,skill.frost-lock,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+寒冰锁,skill.frost-lock,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+寒冰锁,skill.frost-lock,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+圣光术,skill.holy-light,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+圣光术,skill.holy-light,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+圣光术,skill.holy-light,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+圣光术,skill.holy-light,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+猎杀,skill.hunt,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+猎杀,skill.hunt,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+猎杀,skill.hunt,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+猎杀,skill.hunt,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+猎手直觉,skill.hunter-instinct,第 1 段「常驻」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+猎手直觉,skill.hunter-instinct,第 1 段「常驻」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+冲击波,skill.impact-burst,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+冲击波,skill.impact-burst,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+无下限,skill.infinity,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+无下限,skill.infinity,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+洞察,skill.insight,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+洞察,skill.insight,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+洞察,skill.insight,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+洞察,skill.insight,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+铁布衫,skill.iron-shirt,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+铁布衫,skill.iron-shirt,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+铁布衫,skill.iron-shirt,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+铁布衫,skill.iron-shirt,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+背水 · 撑盾,skill.last-stand-shield,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+背水 · 撑盾,skill.last-stand-shield,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+背水 · 撑盾,skill.last-stand-shield,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+背水 · 撑盾,skill.last-stand-shield,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+熔岩护甲,skill.lava-armor,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+熔岩护甲,skill.lava-armor,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+魔法飞弹,skill.magic-bolt,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+魔法飞弹,skill.magic-bolt,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+标记,skill.mark,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+标记,skill.mark,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+名刀·司命,skill.named-blade,第 1 段「常驻」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+名刀·司命,skill.named-blade,第 1 段「常驻」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+布场,skill.place-slow-field,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+布场,skill.place-slow-field,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+布场,skill.place-slow-field,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+布场,skill.place-slow-field,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+亡灵复生,skill.raise-dead,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+亡灵复生,skill.raise-dead,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+亡灵复生,skill.raise-dead,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+亡灵复生,skill.raise-dead,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+迟滞场,skill.slow-field,第 1 段「常驻」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+迟滞场,skill.slow-field,第 1 段「常驻」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+裂魂,skill.soul-rend,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+裂魂,skill.soul-rend,第 1 段「命中」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+潜行,skill.stealth,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+潜行,skill.stealth,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+潜行,skill.stealth,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+潜行,skill.stealth,第 2 段「后摇」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+横砍,skill.ws-slash,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+横砍,skill.ws-slash,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+横砍,skill.ws-slash,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+横砍,skill.ws-slash,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+横砍,skill.ws-slash,第 3 段「后摇」：占用施法者（持续技）,@占用施法者.2,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+横砍,skill.ws-slash,第 3 段「后摇」：占用施法者（持续技）,@占用施法者.2,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+刺击,skill.ws-thrust,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+刺击,skill.ws-thrust,第 1 段「前摇」：占用施法者（持续技）,@占用施法者.0,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+刺击,skill.ws-thrust,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+刺击,skill.ws-thrust,第 2 段「命中」：占用施法者（持续技）,@占用施法者.1,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+刺击,skill.ws-thrust,第 3 段「后摇」：占用施法者（持续技）,@占用施法者.2,FALSE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技） · 出厂值那一格 = 这一档
+刺击,skill.ws-thrust,第 3 段「后摇」：占用施法者（持续技）,@占用施法者.2,TRUE,0,,? 不用填（引擎硬规矩）· 取值：false = 不占用施法者 / true = 占用（持续技）
+,,,,,,,
+=== B 类：压根不在点表里的东西（今天一律 0 点 = 白送）===,,,,,,,
+点表只装「技能 × 变量」；下面这些东西住在别处（实体预设 / 零件原型 / 状态库 / 武器），所以查表账对它们一个字都不动。,,,,,,,
+,,,,,,,
+=== 屏障（实体预设）· 通行策略开关 entity.barrier ===,,,,,,,
+这四个开关住在实体预设里（不在技能的任何数值叶子上）? 查表账对它一个字不动。老公式会为它计价（挡住 = 收益 = 负数）。取值 true = 放行、false = 挡住。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+屏障（实体预设）,entity.barrier,同阵营（自己）的子弹能不能穿过去,block.ownProjectiles,TRUE,0,,预设里现在写的是 true（= 出厂值那一格） · true = 放行 / false = 挡住
+屏障（实体预设）,entity.barrier,同阵营（自己）的子弹能不能穿过去,block.ownProjectiles,FALSE,0,,预设里现在写的是 true · true = 放行 / false = 挡住
+屏障（实体预设）,entity.barrier,敌对阵营的子弹能不能穿过去,block.enemyProjectiles,TRUE,0,,预设里现在写的是 false · true = 放行 / false = 挡住
+屏障（实体预设）,entity.barrier,敌对阵营的子弹能不能穿过去,block.enemyProjectiles,FALSE,0,,预设里现在写的是 false（= 出厂值那一格） · true = 放行 / false = 挡住
+屏障（实体预设）,entity.barrier,同阵营的单位能不能穿过去,block.ownUnits,TRUE,0,,预设里现在写的是 true（= 出厂值那一格） · true = 放行 / false = 挡住
+屏障（实体预设）,entity.barrier,同阵营的单位能不能穿过去,block.ownUnits,FALSE,0,,预设里现在写的是 true · true = 放行 / false = 挡住
+屏障（实体预设）,entity.barrier,敌对阵营的单位能不能穿过去,block.enemyUnits,TRUE,0,,预设里现在写的是 true（= 出厂值那一格） · true = 放行 / false = 挡住
+屏障（实体预设）,entity.barrier,敌对阵营的单位能不能穿过去,block.enemyUnits,FALSE,0,,预设里现在写的是 true · true = 放行 / false = 挡住
+,,,,,,,
+=== 实体预设的其它数值（和 block 开关同一处：都不在表里）===,,,,,,,
+这些数被引擎真的读过（血量池 / 区域半径 / 墙的正面宽度），但技能里写的是「生成哪个预设」（一个 id 字符串），不是数 ? 表里没有格子。,,,,,,,
+--- 屏障 entity.barrier ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+实体预设 · 屏障,entity.barrier,预设的半径（米）,entity.barrier.radius,0.4,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0.4（m）
+实体预设 · 屏障,entity.barrier,预设的半径（米）,entity.barrier.radius,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 屏障,entity.barrier,预设的半径（米）,entity.barrier.radius,0.7,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 屏障,entity.barrier,预设的半径（米）,entity.barrier.radius,0.9,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 屏障,entity.barrier,预设的半径（米）,entity.barrier.radius,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 屏障,entity.barrier,预设的半径（米）,entity.barrier.radius,2.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 屏障,entity.barrier,预设的半径（米）,entity.barrier.radius,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 屏障,entity.barrier,预设的半径（米）,entity.barrier.radius,5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 屏障,entity.barrier,预设的半径（米）,entity.barrier.radius,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 屏障,entity.barrier,墙的正面宽度（米）,entity.barrier.shape.length,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（m）
+实体预设 · 屏障,entity.barrier,墙的正面宽度（米）,entity.barrier.shape.length,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（m）
+实体预设 · 屏障,entity.barrier,墙的正面宽度（米）,entity.barrier.shape.length,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（m）
+实体预设 · 屏障,entity.barrier,墙的正面宽度（米）,entity.barrier.shape.length,6,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 6（m）
+实体预设 · 屏障,entity.barrier,墙的正面宽度（米）,entity.barrier.shape.length,8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（m）
+实体预设 · 屏障,entity.barrier,墙的正面宽度（米）,entity.barrier.shape.length,12,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（m）
+实体预设 · 屏障,entity.barrier,墙的正面宽度（米）,entity.barrier.shape.length,16,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（m）
+实体预设 · 屏障,entity.barrier,墙的厚度（米）,entity.barrier.shape.width,0.2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.6（m）
+实体预设 · 屏障,entity.barrier,墙的厚度（米）,entity.barrier.shape.width,0.4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.6（m）
+实体预设 · 屏障,entity.barrier,墙的厚度（米）,entity.barrier.shape.width,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.6（m）
+实体预设 · 屏障,entity.barrier,墙的厚度（米）,entity.barrier.shape.width,0.6,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0.6（m）
+实体预设 · 屏障,entity.barrier,墙的厚度（米）,entity.barrier.shape.width,0.8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.6（m）
+实体预设 · 屏障,entity.barrier,墙的厚度（米）,entity.barrier.shape.width,1.2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.6（m）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,20,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,30,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,60,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,100,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,120,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,150,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,200,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,400,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,血量上限（耐久）,entity.barrier.attributes.char.hp.max,900,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 120（点）
+实体预设 · 屏障,entity.barrier,能量上限,entity.barrier.attributes.char.energy.max,0,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0（点）
+实体预设 · 屏障,entity.barrier,能量上限,entity.barrier.attributes.char.energy.max,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 屏障,entity.barrier,能量上限,entity.barrier.attributes.char.energy.max,20,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 屏障,entity.barrier,能量上限,entity.barrier.attributes.char.energy.max,40,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 屏障,entity.barrier,能量上限,entity.barrier.attributes.char.energy.max,60,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 屏障,entity.barrier,能量上限,entity.barrier.attributes.char.energy.max,100,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 屏障,entity.barrier,能量上限,entity.barrier.attributes.char.energy.max,200,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+,,,,,,,
+--- 骷髅兵 entity.skeleton ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+实体预设 · 骷髅兵,entity.skeleton,预设的半径（米）,entity.skeleton.radius,0.4,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0.4（m）
+实体预设 · 骷髅兵,entity.skeleton,预设的半径（米）,entity.skeleton.radius,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 骷髅兵,entity.skeleton,预设的半径（米）,entity.skeleton.radius,0.7,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 骷髅兵,entity.skeleton,预设的半径（米）,entity.skeleton.radius,0.9,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 骷髅兵,entity.skeleton,预设的半径（米）,entity.skeleton.radius,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 骷髅兵,entity.skeleton,预设的半径（米）,entity.skeleton.radius,2.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 骷髅兵,entity.skeleton,预设的半径（米）,entity.skeleton.radius,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 骷髅兵,entity.skeleton,预设的半径（米）,entity.skeleton.radius,5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 骷髅兵,entity.skeleton,预设的半径（米）,entity.skeleton.radius,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.4（m）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,20,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,30,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,60,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,100,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,120,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,150,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,200,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,400,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,血量上限,entity.skeleton.attributes.char.hp.max,900,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（点）
+实体预设 · 骷髅兵,entity.skeleton,能量上限,entity.skeleton.attributes.char.energy.max,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 40（点）
+实体预设 · 骷髅兵,entity.skeleton,能量上限,entity.skeleton.attributes.char.energy.max,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 40（点）
+实体预设 · 骷髅兵,entity.skeleton,能量上限,entity.skeleton.attributes.char.energy.max,20,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 40（点）
+实体预设 · 骷髅兵,entity.skeleton,能量上限,entity.skeleton.attributes.char.energy.max,40,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 40（点）
+实体预设 · 骷髅兵,entity.skeleton,能量上限,entity.skeleton.attributes.char.energy.max,60,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 40（点）
+实体预设 · 骷髅兵,entity.skeleton,能量上限,entity.skeleton.attributes.char.energy.max,100,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 40（点）
+实体预设 · 骷髅兵,entity.skeleton,能量上限,entity.skeleton.attributes.char.energy.max,200,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 40（点）
+实体预设 · 骷髅兵,entity.skeleton,能量回复（每秒）,entity.skeleton.attributes.char.energy.regen,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（点/s）
+实体预设 · 骷髅兵,entity.skeleton,能量回复（每秒）,entity.skeleton.attributes.char.energy.regen,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（点/s）
+实体预设 · 骷髅兵,entity.skeleton,能量回复（每秒）,entity.skeleton.attributes.char.energy.regen,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（点/s）
+实体预设 · 骷髅兵,entity.skeleton,能量回复（每秒）,entity.skeleton.attributes.char.energy.regen,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（点/s）
+实体预设 · 骷髅兵,entity.skeleton,能量回复（每秒）,entity.skeleton.attributes.char.energy.regen,6,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 6（点/s）
+实体预设 · 骷髅兵,entity.skeleton,能量回复（每秒）,entity.skeleton.attributes.char.energy.regen,8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（点/s）
+实体预设 · 骷髅兵,entity.skeleton,能量回复（每秒）,entity.skeleton.attributes.char.energy.regen,12,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（点/s）
+实体预设 · 骷髅兵,entity.skeleton,能量回复（每秒）,entity.skeleton.attributes.char.energy.regen,14,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 6（点/s）
+实体预设 · 骷髅兵,entity.skeleton,移速,entity.skeleton.attributes.char.speed,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 4.5（m/s）
+实体预设 · 骷髅兵,entity.skeleton,移速,entity.skeleton.attributes.char.speed,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 4.5（m/s）
+实体预设 · 骷髅兵,entity.skeleton,移速,entity.skeleton.attributes.char.speed,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 4.5（m/s）
+实体预设 · 骷髅兵,entity.skeleton,移速,entity.skeleton.attributes.char.speed,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 4.5（m/s）
+实体预设 · 骷髅兵,entity.skeleton,移速,entity.skeleton.attributes.char.speed,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 4.5（m/s）
+实体预设 · 骷髅兵,entity.skeleton,移速,entity.skeleton.attributes.char.speed,4.5,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 4.5（m/s）
+实体预设 · 骷髅兵,entity.skeleton,移速,entity.skeleton.attributes.char.speed,5.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 4.5（m/s）
+实体预设 · 骷髅兵,entity.skeleton,移速,entity.skeleton.attributes.char.speed,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 4.5（m/s）
+实体预设 · 骷髅兵,entity.skeleton,移速,entity.skeleton.attributes.char.speed,8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 4.5（m/s）
+实体预设 · 骷髅兵,entity.skeleton,移速,entity.skeleton.attributes.char.speed,12,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 4.5（m/s）
+,,,,,,,
+--- 迟滞场 entity.slow-field ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+实体预设 · 迟滞场,entity.slow-field,预设的半径（米）,entity.slow-field.radius,0.4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 5（m）
+实体预设 · 迟滞场,entity.slow-field,预设的半径（米）,entity.slow-field.radius,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 5（m）
+实体预设 · 迟滞场,entity.slow-field,预设的半径（米）,entity.slow-field.radius,0.7,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 5（m）
+实体预设 · 迟滞场,entity.slow-field,预设的半径（米）,entity.slow-field.radius,0.9,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 5（m）
+实体预设 · 迟滞场,entity.slow-field,预设的半径（米）,entity.slow-field.radius,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 5（m）
+实体预设 · 迟滞场,entity.slow-field,预设的半径（米）,entity.slow-field.radius,2.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 5（m）
+实体预设 · 迟滞场,entity.slow-field,预设的半径（米）,entity.slow-field.radius,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 5（m）
+实体预设 · 迟滞场,entity.slow-field,预设的半径（米）,entity.slow-field.radius,5,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 5（m）
+实体预设 · 迟滞场,entity.slow-field,预设的半径（米）,entity.slow-field.radius,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 5（m）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,1,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,20,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,30,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,60,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,100,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,120,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,150,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,200,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,400,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,血量上限,entity.slow-field.attributes.char.hp.max,900,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（点）
+实体预设 · 迟滞场,entity.slow-field,能量上限,entity.slow-field.attributes.char.energy.max,0,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0（点）
+实体预设 · 迟滞场,entity.slow-field,能量上限,entity.slow-field.attributes.char.energy.max,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 迟滞场,entity.slow-field,能量上限,entity.slow-field.attributes.char.energy.max,20,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 迟滞场,entity.slow-field,能量上限,entity.slow-field.attributes.char.energy.max,40,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 迟滞场,entity.slow-field,能量上限,entity.slow-field.attributes.char.energy.max,60,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 迟滞场,entity.slow-field,能量上限,entity.slow-field.attributes.char.energy.max,100,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 迟滞场,entity.slow-field,能量上限,entity.slow-field.attributes.char.energy.max,200,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 迟滞场,entity.slow-field,移速,entity.slow-field.attributes.char.speed,0,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0（m/s）
+实体预设 · 迟滞场,entity.slow-field,移速,entity.slow-field.attributes.char.speed,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 迟滞场,entity.slow-field,移速,entity.slow-field.attributes.char.speed,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 迟滞场,entity.slow-field,移速,entity.slow-field.attributes.char.speed,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 迟滞场,entity.slow-field,移速,entity.slow-field.attributes.char.speed,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 迟滞场,entity.slow-field,移速,entity.slow-field.attributes.char.speed,4.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 迟滞场,entity.slow-field,移速,entity.slow-field.attributes.char.speed,5.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 迟滞场,entity.slow-field,移速,entity.slow-field.attributes.char.speed,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 迟滞场,entity.slow-field,移速,entity.slow-field.attributes.char.speed,8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 迟滞场,entity.slow-field,移速,entity.slow-field.attributes.char.speed,12,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+,,,,,,,
+--- 图腾 entity.totem ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+实体预设 · 图腾,entity.totem,预设的半径（米）,entity.totem.radius,0.4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（m）
+实体预设 · 图腾,entity.totem,预设的半径（米）,entity.totem.radius,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（m）
+实体预设 · 图腾,entity.totem,预设的半径（米）,entity.totem.radius,0.7,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0.7（m）
+实体预设 · 图腾,entity.totem,预设的半径（米）,entity.totem.radius,0.9,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（m）
+实体预设 · 图腾,entity.totem,预设的半径（米）,entity.totem.radius,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（m）
+实体预设 · 图腾,entity.totem,预设的半径（米）,entity.totem.radius,2.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（m）
+实体预设 · 图腾,entity.totem,预设的半径（米）,entity.totem.radius,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（m）
+实体预设 · 图腾,entity.totem,预设的半径（米）,entity.totem.radius,5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（m）
+实体预设 · 图腾,entity.totem,预设的半径（米）,entity.totem.radius,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（m）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,20,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,30,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,60,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,100,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,120,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,150,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,200,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,400,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,血量上限,entity.totem.attributes.char.hp.max,900,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+实体预设 · 图腾,entity.totem,能量上限,entity.totem.attributes.char.energy.max,0,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0（点）
+实体预设 · 图腾,entity.totem,能量上限,entity.totem.attributes.char.energy.max,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 图腾,entity.totem,能量上限,entity.totem.attributes.char.energy.max,20,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 图腾,entity.totem,能量上限,entity.totem.attributes.char.energy.max,40,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 图腾,entity.totem,能量上限,entity.totem.attributes.char.energy.max,60,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 图腾,entity.totem,能量上限,entity.totem.attributes.char.energy.max,100,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 图腾,entity.totem,能量上限,entity.totem.attributes.char.energy.max,200,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（点）
+实体预设 · 图腾,entity.totem,移速,entity.totem.attributes.char.speed,0,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0（m/s）
+实体预设 · 图腾,entity.totem,移速,entity.totem.attributes.char.speed,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 图腾,entity.totem,移速,entity.totem.attributes.char.speed,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 图腾,entity.totem,移速,entity.totem.attributes.char.speed,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 图腾,entity.totem,移速,entity.totem.attributes.char.speed,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 图腾,entity.totem,移速,entity.totem.attributes.char.speed,4.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 图腾,entity.totem,移速,entity.totem.attributes.char.speed,5.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 图腾,entity.totem,移速,entity.totem.attributes.char.speed,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 图腾,entity.totem,移速,entity.totem.attributes.char.speed,8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+实体预设 · 图腾,entity.totem,移速,entity.totem.attributes.char.speed,12,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（m/s）
+,,,,,,,
+=== 状态库里的数值（content/statuses/*.json）===,,,,,,,
+技能按 id 引用一个状态时（例如灵光盾用 status.shield），状态的持续与吸收量住在状态库里 ? 技能表里没有格子。,,,,,,,
+--- 护盾 status.shield ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+状态 · 护盾,status.shield,状态的持续时间（秒）,status.shield.duration,0.2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 10（s）
+状态 · 护盾,status.shield,状态的持续时间（秒）,status.shield.duration,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 10（s）
+状态 · 护盾,status.shield,状态的持续时间（秒）,status.shield.duration,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 10（s）
+状态 · 护盾,status.shield,状态的持续时间（秒）,status.shield.duration,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 10（s）
+状态 · 护盾,status.shield,状态的持续时间（秒）,status.shield.duration,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 10（s）
+状态 · 护盾,status.shield,状态的持续时间（秒）,status.shield.duration,5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 10（s）
+状态 · 护盾,status.shield,状态的持续时间（秒）,status.shield.duration,10,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 10（s）
+状态 · 护盾,status.shield,状态的持续时间（秒）,status.shield.duration,15,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 10（s）
+状态 · 护盾,status.shield,状态的持续时间（秒）,status.shield.duration,25,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 10（s）
+状态 · 护盾,status.shield,状态的持续时间（秒）,status.shield.duration,60,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 10（s）
+状态 · 护盾,status.shield,能挡多少伤害（吸收池）,status.shield.hooks[0].absorb.perStack,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+状态 · 护盾,status.shield,能挡多少伤害（吸收池）,status.shield.hooks[0].absorb.perStack,25,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+状态 · 护盾,status.shield,能挡多少伤害（吸收池）,status.shield.hooks[0].absorb.perStack,50,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+状态 · 护盾,status.shield,能挡多少伤害（吸收池）,status.shield.hooks[0].absorb.perStack,100,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+状态 · 护盾,status.shield,能挡多少伤害（吸收池）,status.shield.hooks[0].absorb.perStack,150,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 150（点）
+状态 · 护盾,status.shield,能挡多少伤害（吸收池）,status.shield.hooks[0].absorb.perStack,250,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+状态 · 护盾,status.shield,能挡多少伤害（吸收池）,status.shield.hooks[0].absorb.perStack,500,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+状态 · 护盾,status.shield,能挡多少伤害（吸收池）,status.shield.hooks[0].absorb.perStack,1000,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 150（点）
+,,,,,,,
+=== 修饰零件（content/modifiers/*.json）的参数 ===,,,,,,,
+零件挂在术式的段上。它的参数不在点表里；今天这一档的价由代码里的公式 × balance.json 的 modifierRates 算（落在术式账上）—— 要不要也改成逐档填表，请裁。,,,,,,,
+,,,,,,,
+--- 修饰零件 · 等待 X 秒 mod.wait ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+修饰零件 · 等待 X 秒,mod.wait,等多久（秒）,mod.wait.params.seconds,0.2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（s）
+修饰零件 · 等待 X 秒,mod.wait,等多久（秒）,mod.wait.params.seconds,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（s）
+修饰零件 · 等待 X 秒,mod.wait,等多久（秒）,mod.wait.params.seconds,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（s）
+修饰零件 · 等待 X 秒,mod.wait,等多久（秒）,mod.wait.params.seconds,1.5,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 1.5（s）
+修饰零件 · 等待 X 秒,mod.wait,等多久（秒）,mod.wait.params.seconds,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（s）
+修饰零件 · 等待 X 秒,mod.wait,等多久（秒）,mod.wait.params.seconds,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（s）
+修饰零件 · 等待 X 秒,mod.wait,这 X 秒里锁住哪些能力（移动 / 转身；施法与攻击是引擎硬规矩、不在里面）,mod.wait.params.locks,"[move, turn]",0,,原型里的现在值是 [] · 可选项：move / turn（可以组合成列表）
+修饰零件 · 等待 X 秒,mod.wait,这 X 秒里锁住哪些能力（移动 / 转身；施法与攻击是引擎硬规矩、不在里面）,mod.wait.params.locks,[move],0,,原型里的现在值是 [] · 可选项：move / turn（可以组合成列表）
+修饰零件 · 等待 X 秒,mod.wait,这 X 秒里锁住哪些能力（移动 / 转身；施法与攻击是引擎硬规矩、不在里面）,mod.wait.params.locks,[turn],0,,原型里的现在值是 [] · 可选项：move / turn（可以组合成列表）
+修饰零件 · 等待 X 秒,mod.wait,这 X 秒里锁住哪些能力（移动 / 转身；施法与攻击是引擎硬规矩、不在里面）,mod.wait.params.locks,[]（都不锁）,0,,原型里的现在值是 [] · 可选项：move / turn（可以组合成列表）
+修饰零件 · 等待 X 秒,mod.wait,这段空档能不能被打断（默认不能）,mod.wait.params.interrupt,none,0,,原型里的现在值是 none（= 默认值那一格） · 可选项：none / control / damage
+修饰零件 · 等待 X 秒,mod.wait,这段空档能不能被打断（默认不能）,mod.wait.params.interrupt,control,0,,原型里的现在值是 none · 可选项：none / control / damage
+修饰零件 · 等待 X 秒,mod.wait,这段空档能不能被打断（默认不能）,mod.wait.params.interrupt,damage,0,,原型里的现在值是 none · 可选项：none / control / damage
+,,,,,,,
+--- 修饰零件 · 追踪 mod.homing ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,7,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,9,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,11,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,12,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,13,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,14,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,15,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,16,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,17,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,18,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,19,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,20,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,21,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,22,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,23,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,24,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,25,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,26,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,27,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,28,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,29,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,每 tick 最多拐多少度,mod.homing.params.turnRate,30,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 12（度/tick）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,7,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,8,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,9,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,11,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,12,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,13,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,14,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,15,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+修饰零件 · 追踪,mod.homing,看得见多远以内的敌人（米）,mod.homing.params.maxRange,16,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 8（m）
+,,,,,,,
+--- 修饰零件 · 弹射 mod.bounce ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+修饰零件 · 弹射,mod.bounce,最多弹几次,mod.bounce.params.maxBounces,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（次）
+修饰零件 · 弹射,mod.bounce,最多弹几次,mod.bounce.params.maxBounces,2,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 2（次）
+修饰零件 · 弹射,mod.bounce,最多弹几次,mod.bounce.params.maxBounces,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（次）
+修饰零件 · 弹射,mod.bounce,最多弹几次,mod.bounce.params.maxBounces,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（次）
+修饰零件 · 弹射,mod.bounce,每弹一次，下一段乘多少,mod.bounce.params.damageFalloff,0.1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（×）
+修饰零件 · 弹射,mod.bounce,每弹一次，下一段乘多少,mod.bounce.params.damageFalloff,0.2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（×）
+修饰零件 · 弹射,mod.bounce,每弹一次，下一段乘多少,mod.bounce.params.damageFalloff,0.3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（×）
+修饰零件 · 弹射,mod.bounce,每弹一次，下一段乘多少,mod.bounce.params.damageFalloff,0.4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（×）
+修饰零件 · 弹射,mod.bounce,每弹一次，下一段乘多少,mod.bounce.params.damageFalloff,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（×）
+修饰零件 · 弹射,mod.bounce,每弹一次，下一段乘多少,mod.bounce.params.damageFalloff,0.6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（×）
+修饰零件 · 弹射,mod.bounce,每弹一次，下一段乘多少,mod.bounce.params.damageFalloff,0.7,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0.7（×）
+修饰零件 · 弹射,mod.bounce,每弹一次，下一段乘多少,mod.bounce.params.damageFalloff,0.8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（×）
+修饰零件 · 弹射,mod.bounce,每弹一次，下一段乘多少,mod.bounce.params.damageFalloff,0.9,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（×）
+修饰零件 · 弹射,mod.bounce,每弹一次，下一段乘多少,mod.bounce.params.damageFalloff,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.7（×）
+,,,,,,,
+--- 修饰零件 · 排布 mod.layout ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+修饰零件 · 排布,mod.layout,怎么摆（环绕 / 扇形散射 / 反向镜像）,mod.layout.params.type,ring,0,,原型里的现在值是 ring（= 默认值那一格） · 可选项：ring / fan / mirror
+修饰零件 · 排布,mod.layout,怎么摆（环绕 / 扇形散射 / 反向镜像）,mod.layout.params.type,fan,0,,原型里的现在值是 ring · 可选项：ring / fan / mirror
+修饰零件 · 排布,mod.layout,怎么摆（环绕 / 扇形散射 / 反向镜像）,mod.layout.params.type,mirror,0,,原型里的现在值是 ring · 可选项：ring / fan / mirror
+修饰零件 · 排布,mod.layout,环绕的半径（米）,mod.layout.params.radius,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（m）
+修饰零件 · 排布,mod.layout,环绕的半径（米）,mod.layout.params.radius,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（m）
+修饰零件 · 排布,mod.layout,环绕的半径（米）,mod.layout.params.radius,1.5,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 1.5（m）
+修饰零件 · 排布,mod.layout,环绕的半径（米）,mod.layout.params.radius,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（m）
+修饰零件 · 排布,mod.layout,环绕的半径（米）,mod.layout.params.radius,2.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（m）
+修饰零件 · 排布,mod.layout,环绕的半径（米）,mod.layout.params.radius,3.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（m）
+修饰零件 · 排布,mod.layout,环绕的半径（米）,mod.layout.params.radius,4.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（m）
+修饰零件 · 排布,mod.layout,环绕的半径（米）,mod.layout.params.radius,5.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（m）
+修饰零件 · 排布,mod.layout,环绕的半径（米）,mod.layout.params.radius,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.5（m）
+修饰零件 · 排布,mod.layout,环绕从哪个方向起算（度）,mod.layout.params.startAngle,-180,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,环绕从哪个方向起算（度）,mod.layout.params.startAngle,-135,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,环绕从哪个方向起算（度）,mod.layout.params.startAngle,-90,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,环绕从哪个方向起算（度）,mod.layout.params.startAngle,-45,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,环绕从哪个方向起算（度）,mod.layout.params.startAngle,0,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0（°）
+修饰零件 · 排布,mod.layout,环绕从哪个方向起算（度）,mod.layout.params.startAngle,45,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,环绕从哪个方向起算（度）,mod.layout.params.startAngle,90,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,环绕从哪个方向起算（度）,mod.layout.params.startAngle,135,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,环绕从哪个方向起算（度）,mod.layout.params.startAngle,180,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,是否均匀分布（关掉 = 全都摆在同一方向上）,mod.layout.params.even,TRUE,0,,原型里的现在值是 true（= 默认值那一格）
+修饰零件 · 排布,mod.layout,是否均匀分布（关掉 = 全都摆在同一方向上）,mod.layout.params.even,FALSE,0,,原型里的现在值是 true
+修饰零件 · 排布,mod.layout,扇形散射的张角（度）,mod.layout.params.spread,0,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（°）
+修饰零件 · 排布,mod.layout,扇形散射的张角（度）,mod.layout.params.spread,30,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（°）
+修饰零件 · 排布,mod.layout,扇形散射的张角（度）,mod.layout.params.spread,60,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 60（°）
+修饰零件 · 排布,mod.layout,扇形散射的张角（度）,mod.layout.params.spread,90,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（°）
+修饰零件 · 排布,mod.layout,扇形散射的张角（度）,mod.layout.params.spread,120,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（°）
+修饰零件 · 排布,mod.layout,扇形散射的张角（度）,mod.layout.params.spread,180,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（°）
+修饰零件 · 排布,mod.layout,扇形散射的张角（度）,mod.layout.params.spread,270,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（°）
+修饰零件 · 排布,mod.layout,扇形散射的张角（度）,mod.layout.params.spread,360,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 60（°）
+修饰零件 · 排布,mod.layout,反向镜像的偏移角（度）,mod.layout.params.mirrorAngle,-45,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,反向镜像的偏移角（度）,mod.layout.params.mirrorAngle,-22.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,反向镜像的偏移角（度）,mod.layout.params.mirrorAngle,0,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0（°）
+修饰零件 · 排布,mod.layout,反向镜像的偏移角（度）,mod.layout.params.mirrorAngle,22.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+修饰零件 · 排布,mod.layout,反向镜像的偏移角（度）,mod.layout.params.mirrorAngle,45,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0（°）
+,,,,,,,
+--- 修饰零件 · 多重释放 mod.multi.fire ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+修饰零件 · 多重释放,mod.multi.fire,一次打出几份,mod.multi.fire.params.count,2,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 2（份）
+修饰零件 · 多重释放,mod.multi.fire,一次打出几份,mod.multi.fire.params.count,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（份）
+修饰零件 · 多重释放,mod.multi.fire,一次打出几份,mod.multi.fire.params.count,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（份）
+修饰零件 · 多重释放,mod.multi.fire,一次打出几份,mod.multi.fire.params.count,5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（份）
+修饰零件 · 多重释放,mod.multi.fire,一次打出几份,mod.multi.fire.params.count,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（份）
+修饰零件 · 多重释放,mod.multi.fire,一次打出几份,mod.multi.fire.params.count,7,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（份）
+修饰零件 · 多重释放,mod.multi.fire,一次打出几份,mod.multi.fire.params.count,8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（份）
+修饰零件 · 多重释放,mod.multi.fire,一次打出几份,mod.multi.fire.params.count,9,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（份）
+修饰零件 · 多重释放,mod.multi.fire,一次打出几份,mod.multi.fire.params.count,10,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（份）
+,,,,,,,
+--- 修饰零件 · 一分为 X mod.split ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+修饰零件 · 一分为 X,mod.split,掰成几份,mod.split.params.count,2,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 2（份）
+修饰零件 · 一分为 X,mod.split,掰成几份,mod.split.params.count,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（份）
+修饰零件 · 一分为 X,mod.split,掰成几份,mod.split.params.count,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2（份）
+,,,,,,,
+--- 修饰零件 · 命悬监测 mod.monitor.low-hp ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+修饰零件 · 命悬监测,mod.monitor.low-hp,什么时候看,mod.monitor.low-hp.params.when,onLowHp / onTick / onCast / onExpire（今天真正接线的四个时机）,0,,原型里的现在值是 onLowHp · ? 这是一个「时机」枚举，不是数量 ? 引擎今天只认那四个；写别的只有一条警告（MODIFIER_TRIGGER_NOT_WIRED）
+修饰零件 · 命悬监测,mod.monitor.low-hp,满足什么条件,mod.monitor.low-hp.params.condition,condition（枚举/开关，不是一个数量）,0,,原型里的现在值是 （一个对象，见原型） · ? 行为开关（不是数值档位）? 只给一行；要不要按档定价请裁
+修饰零件 · 命悬监测,mod.monitor.low-hp,跨过才算（不是一直都算）,mod.monitor.low-hp.params.crossing,TRUE,0,,原型里的现在值是 true（= 默认值那一格）
+修饰零件 · 命悬监测,mod.monitor.low-hp,跨过才算（不是一直都算）,mod.monitor.low-hp.params.crossing,FALSE,0,,原型里的现在值是 true
+修饰零件 · 命悬监测,mod.monitor.low-hp,生成在哪里,mod.monitor.low-hp.params.origin,caster,0,,原型里的现在值是 caster（= 默认值那一格） · 可选项：caster / aim / prevHitPoint / prevEndPoint
+修饰零件 · 命悬监测,mod.monitor.low-hp,生成在哪里,mod.monitor.low-hp.params.origin,aim,0,,原型里的现在值是 caster · 可选项：caster / aim / prevHitPoint / prevEndPoint
+修饰零件 · 命悬监测,mod.monitor.low-hp,生成在哪里,mod.monitor.low-hp.params.origin,prevHitPoint,0,,原型里的现在值是 caster · 可选项：caster / aim / prevHitPoint / prevEndPoint
+修饰零件 · 命悬监测,mod.monitor.low-hp,生成在哪里,mod.monitor.low-hp.params.origin,prevEndPoint,0,,原型里的现在值是 caster · 可选项：caster / aim / prevHitPoint / prevEndPoint
+,,,,,,,
+--- 修饰零件 · 应声触发 mod.trigger.on-cast ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+修饰零件 · 应声触发,mod.trigger.on-cast,哪个时机,mod.trigger.on-cast.params.when,onLowHp / onTick / onCast / onExpire（今天真正接线的四个时机）,0,,原型里的现在值是 onExpire · ? 这是一个「时机」枚举，不是数量 ? 引擎今天只认那四个；写别的只有一条警告（MODIFIER_TRIGGER_NOT_WIRED）
+修饰零件 · 应声触发,mod.trigger.on-cast,跨过才算（不是一直都算）,mod.trigger.on-cast.params.crossing,TRUE,0,,原型里的现在值是 false
+修饰零件 · 应声触发,mod.trigger.on-cast,跨过才算（不是一直都算）,mod.trigger.on-cast.params.crossing,FALSE,0,,原型里的现在值是 false（= 默认值那一格）
+修饰零件 · 应声触发,mod.trigger.on-cast,生成在哪里,mod.trigger.on-cast.params.origin,caster,0,,原型里的现在值是 aim · 可选项：caster / aim / prevHitPoint / prevEndPoint
+修饰零件 · 应声触发,mod.trigger.on-cast,生成在哪里,mod.trigger.on-cast.params.origin,aim,0,,原型里的现在值是 aim（= 默认值那一格） · 可选项：caster / aim / prevHitPoint / prevEndPoint
+修饰零件 · 应声触发,mod.trigger.on-cast,生成在哪里,mod.trigger.on-cast.params.origin,prevHitPoint,0,,原型里的现在值是 aim · 可选项：caster / aim / prevHitPoint / prevEndPoint
+修饰零件 · 应声触发,mod.trigger.on-cast,生成在哪里,mod.trigger.on-cast.params.origin,prevEndPoint,0,,原型里的现在值是 aim · 可选项：caster / aim / prevHitPoint / prevEndPoint
+,,,,,,,
+--- 修饰零件 · 常驻包装 mod.wrap.persistent ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+修饰零件 · 常驻包装,mod.wrap.persistent,包装成什么,mod.wrap.persistent.params.effect,persistent,0,,原型里的现在值是 persistent（= 默认值那一格） · 可选项：persistent
+,,,,,,,
+=== 修饰零件副本 · 修饰目标序号 mods[].at ===,,,,,,,
+一条序列里，副本修饰它后面第几个技能（0 = 紧邻的下一个）。今天引擎只接线 at = 0，写更大的值只有一条校验警告（MODIFIER_GROUP_AT_NOT_WIRED）。,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+修饰零件副本（全部零件通用）,content/modifiers/*.json 的副本,副本修饰它后面第几个技能（序号）,SequenceSegment.mods[].at,0（今天唯一接线的值）,0,,? 出厂内容里一个修饰副本都没有 ? 它在今天这份表里必然是 0 · at ≥ 1 不生效，要不要定价请裁
+,,,,,,,
+=== 武器属性（武器技能的数值由它们代入；今天不在点表里 ? 0 点 = 白送）===,,,,,,,
+武器技能模板里写 ref: weapon.reach 这种引用 ? 技能自己的那个数值叶子是「引用」而不是数，点表查不到它。,,,,,,,
+--- 武器 · 铁剑 weapon.iron-sword ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+武器 · 铁剑,weapon.iron-sword,打得到多远（米）,weapon.iron-sword.attributes.weapon.reach,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2.2（m）
+武器 · 铁剑,weapon.iron-sword,打得到多远（米）,weapon.iron-sword.attributes.weapon.reach,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2.2（m）
+武器 · 铁剑,weapon.iron-sword,打得到多远（米）,weapon.iron-sword.attributes.weapon.reach,2.2,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 2.2（m）
+武器 · 铁剑,weapon.iron-sword,打得到多远（米）,weapon.iron-sword.attributes.weapon.reach,2.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2.2（m）
+武器 · 铁剑,weapon.iron-sword,打得到多远（米）,weapon.iron-sword.attributes.weapon.reach,3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2.2（m）
+武器 · 铁剑,weapon.iron-sword,打得到多远（米）,weapon.iron-sword.attributes.weapon.reach,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2.2（m）
+武器 · 铁剑,weapon.iron-sword,打得到多远（米）,weapon.iron-sword.attributes.weapon.reach,5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2.2（m）
+武器 · 铁剑,weapon.iron-sword,打得到多远（米）,weapon.iron-sword.attributes.weapon.reach,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2.2（m）
+武器 · 铁剑,weapon.iron-sword,打得到多远（米）,weapon.iron-sword.attributes.weapon.reach,8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 2.2（m）
+武器 · 铁剑,weapon.iron-sword,伤害倍率,weapon.iron-sword.attributes.weapon.damage,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.8（×）
+武器 · 铁剑,weapon.iron-sword,伤害倍率,weapon.iron-sword.attributes.weapon.damage,0.8,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0.8（×）
+武器 · 铁剑,weapon.iron-sword,伤害倍率,weapon.iron-sword.attributes.weapon.damage,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.8（×）
+武器 · 铁剑,weapon.iron-sword,伤害倍率,weapon.iron-sword.attributes.weapon.damage,1.1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.8（×）
+武器 · 铁剑,weapon.iron-sword,伤害倍率,weapon.iron-sword.attributes.weapon.damage,1.25,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.8（×）
+武器 · 铁剑,weapon.iron-sword,伤害倍率,weapon.iron-sword.attributes.weapon.damage,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.8（×）
+武器 · 铁剑,weapon.iron-sword,伤害倍率,weapon.iron-sword.attributes.weapon.damage,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.8（×）
+武器 · 铁剑,weapon.iron-sword,前后摇倍率（攻速）,weapon.iron-sword.attributes.weapon.windup,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.15（×）
+武器 · 铁剑,weapon.iron-sword,前后摇倍率（攻速）,weapon.iron-sword.attributes.weapon.windup,0.7,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.15（×）
+武器 · 铁剑,weapon.iron-sword,前后摇倍率（攻速）,weapon.iron-sword.attributes.weapon.windup,0.85,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.15（×）
+武器 · 铁剑,weapon.iron-sword,前后摇倍率（攻速）,weapon.iron-sword.attributes.weapon.windup,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.15（×）
+武器 · 铁剑,weapon.iron-sword,前后摇倍率（攻速）,weapon.iron-sword.attributes.weapon.windup,1.15,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 1.15（×）
+武器 · 铁剑,weapon.iron-sword,前后摇倍率（攻速）,weapon.iron-sword.attributes.weapon.windup,1.3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.15（×）
+武器 · 铁剑,weapon.iron-sword,前后摇倍率（攻速）,weapon.iron-sword.attributes.weapon.windup,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.15（×）
+武器 · 铁剑,weapon.iron-sword,前后摇倍率（攻速）,weapon.iron-sword.attributes.weapon.windup,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.15（×）
+武器 · 铁剑,weapon.iron-sword,给持有者的移速倍率（不是武器自己的属性，是加到人身上的修饰）,weapon.iron-sword.attributes.char.speed,（这把武器没写，走引擎兜底）,0,,? 连续量 ? 只有这一行 · 不在表里 ? 查表账 0 点（白送）；要不要按「每米 / 每倍率」定价请裁
+,,,,,,,
+--- 武器 · 长剑 weapon.longsword ---,,,,,,,
+技能（中文名）,技能 id,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+武器 · 长剑,weapon.longsword,打得到多远（米）,weapon.longsword.attributes.weapon.reach,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 3（m）
+武器 · 长剑,weapon.longsword,打得到多远（米）,weapon.longsword.attributes.weapon.reach,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 3（m）
+武器 · 长剑,weapon.longsword,打得到多远（米）,weapon.longsword.attributes.weapon.reach,2.2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 3（m）
+武器 · 长剑,weapon.longsword,打得到多远（米）,weapon.longsword.attributes.weapon.reach,2.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 3（m）
+武器 · 长剑,weapon.longsword,打得到多远（米）,weapon.longsword.attributes.weapon.reach,3,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 3（m）
+武器 · 长剑,weapon.longsword,打得到多远（米）,weapon.longsword.attributes.weapon.reach,4,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 3（m）
+武器 · 长剑,weapon.longsword,打得到多远（米）,weapon.longsword.attributes.weapon.reach,5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 3（m）
+武器 · 长剑,weapon.longsword,打得到多远（米）,weapon.longsword.attributes.weapon.reach,6,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 3（m）
+武器 · 长剑,weapon.longsword,打得到多远（米）,weapon.longsword.attributes.weapon.reach,8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 3（m）
+武器 · 长剑,weapon.longsword,伤害倍率,weapon.longsword.attributes.weapon.damage,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.1（×）
+武器 · 长剑,weapon.longsword,伤害倍率,weapon.longsword.attributes.weapon.damage,0.8,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.1（×）
+武器 · 长剑,weapon.longsword,伤害倍率,weapon.longsword.attributes.weapon.damage,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.1（×）
+武器 · 长剑,weapon.longsword,伤害倍率,weapon.longsword.attributes.weapon.damage,1.1,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 1.1（×）
+武器 · 长剑,weapon.longsword,伤害倍率,weapon.longsword.attributes.weapon.damage,1.25,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.1（×）
+武器 · 长剑,weapon.longsword,伤害倍率,weapon.longsword.attributes.weapon.damage,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.1（×）
+武器 · 长剑,weapon.longsword,伤害倍率,weapon.longsword.attributes.weapon.damage,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1.1（×）
+武器 · 长剑,weapon.longsword,前后摇倍率（攻速）,weapon.longsword.attributes.weapon.windup,0.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（×）
+武器 · 长剑,weapon.longsword,前后摇倍率（攻速）,weapon.longsword.attributes.weapon.windup,0.7,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（×）
+武器 · 长剑,weapon.longsword,前后摇倍率（攻速）,weapon.longsword.attributes.weapon.windup,0.85,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（×）
+武器 · 长剑,weapon.longsword,前后摇倍率（攻速）,weapon.longsword.attributes.weapon.windup,1,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 1（×）
+武器 · 长剑,weapon.longsword,前后摇倍率（攻速）,weapon.longsword.attributes.weapon.windup,1.15,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（×）
+武器 · 长剑,weapon.longsword,前后摇倍率（攻速）,weapon.longsword.attributes.weapon.windup,1.3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（×）
+武器 · 长剑,weapon.longsword,前后摇倍率（攻速）,weapon.longsword.attributes.weapon.windup,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（×）
+武器 · 长剑,weapon.longsword,前后摇倍率（攻速）,weapon.longsword.attributes.weapon.windup,2,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 1（×）
+武器 · 长剑,weapon.longsword,给持有者的移速倍率,weapon.longsword.attributes.char.speed,0.7,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.95（×）
+武器 · 长剑,weapon.longsword,给持有者的移速倍率,weapon.longsword.attributes.char.speed,0.85,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.95（×）
+武器 · 长剑,weapon.longsword,给持有者的移速倍率,weapon.longsword.attributes.char.speed,0.95,0,0（锁定，不许改）,⚠ 出厂值那一格：必须留 0，不许改 · 内容 / 原型里现在写的就是 0.95（×）
+武器 · 长剑,weapon.longsword,给持有者的移速倍率,weapon.longsword.attributes.char.speed,1,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.95（×）
+武器 · 长剑,weapon.longsword,给持有者的移速倍率,weapon.longsword.attributes.char.speed,1.15,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.95（×）
+武器 · 长剑,weapon.longsword,给持有者的移速倍率,weapon.longsword.attributes.char.speed,1.3,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.95（×）
+武器 · 长剑,weapon.longsword,给持有者的移速倍率,weapon.longsword.attributes.char.speed,1.5,0,,⚠ 待用户改（档位表本身也是设计，用户会像改数一样改它）· 内容 / 原型里现在写的是 0.95（×）
+,,,,,,,
+=== 阶段时长（倍数档）· tierTables.phaseDurationPoints（共享四格默认 + 可按技能覆盖）===,,,,,,,
+⚠ 这四档是**倍数**，不是绝对秒数：1× = **这个技能自己的**出厂时长（每一段一个基准）；无 = 0 秒（取消这一段，引擎按瞬发处理）；3× / 9× = 出厂时长的三倍 / 九倍。,,,,,,,
+⚠ 蓄力（−1，"按住键"）**单独一档、不在倍数里** —— 它的价是 rates.chargePhasePerPoint 一笔定额（那不是这张表的活）。,,,,,,,
+★这四行**今天就生效**★（src/pricing.ts 的 phaseDurationTierPriceOf 读它，界面和设备同一条判据）；用户 2026-09-30 原话："先按你的默认值来，以后我会改"。,,,,,,,
+要按技能改：在 content/balance.json 的 tierTables.phaseDurationPoints.bySkill 里写「技能 id: { 档位: 点数 }」—— 只写要改的那几档，其余照旧走这四行（加法式覆盖，不是整张换掉）。,,,,,,,
+档位（倍数）,分区,变量（中文名）,变量键,取值,现在是多少,★你要填的点数★,备注
+阶段时长（倍数档）,tierTables.phaseDurationPoints,无（0 秒 = 取消这一段）,phaseDurationPoints,0,-6,-6,今天生效的默认值（用户 2026-09-30 批的起点）· ⚠ 它必须是全表最贵的一档（用户原话"没有前摇很超标"）
+阶段时长（倍数档）,tierTables.phaseDurationPoints,1×（= 这个技能自己的出厂时长）,phaseDurationPoints,1,0,0（锁定，不许改）,中性档：出厂值自己减自己 = 0，是"出厂全 0"的地基（校验器报 TIER_TABLE_NEUTRAL_NOT_ZERO）
+阶段时长（倍数档）,tierTables.phaseDurationPoints,3×,phaseDurationPoints,3,2,2,今天生效的默认值（用户 2026-09-30 批的起点）
+阶段时长（倍数档）,tierTables.phaseDurationPoints,9×,phaseDurationPoints,9,4,4,今天生效的默认值（用户 2026-09-30 批的起点）

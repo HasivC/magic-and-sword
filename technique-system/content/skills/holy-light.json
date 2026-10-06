@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.holy-light",
+  "name": "圣光术",
+  "note": "脚下升起一圈光环，站在里面就回血。这是续航和保命的手段，也是少数「对自己有效」的输出位技能。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "self"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"）。\n\n⚠ 出厂内容里没有术式引用它；判据是**技能自己的注释**：\n「光环比自己大一圈（4 米）……目前只对自己有效（`targeting.valid = self`），因为队伍和盟友还没做」。\n⚠ `valid: ['ally']` 是**错的**：`matchesValid` 的 `ally` 明确排除自己（`e.id !== caster.id`），\n所以那样写这个光环一个人都罩不到 —— 治疗一点都不会发生。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n⚠ **意图 ≠ 瞄准方式**：客户端始终只交\"鼠标位置那一个点\"，技能各自解释它。",
+  "_comment": "第一个用 aura 载体的技能。aura 是「跟着施法者走」的载体 —— 无下限用的那个是 area（钉在地上不动），两者在引擎里是两种判定。",
+  "_comment_aura": "光环比自己大一圈（4 米），所以它其实是个「治疗领域」：站在里面就回血。目前只对自己有效（targeting.valid = self），因为队伍和盟友还没做。",
+  "_comment_curse": "⚠ 它会和「亡灵诅咒」形成真正的互动：被诅咒时治疗会反转成伤害（见 curse-of-undead.json）。那条路上用到的是 hitKindIs 条件 —— 在此之前整个引擎里没有人用过它。所以这个技能不只是回血，它还是「别在被诅咒的时候贪治疗」这个决策的一半。",
+  "phases": [
+    {
+      "id": "pray",
+      "name": "前摇",
+      "duration": 0.5,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 20
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "settle",
+      "name": "后摇",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "pray",
+      "then": [
+        {
+          "delivery": {
+            "kind": "aura",
+            "radius": 4
+          },
+          "payload": {
+            "kind": "heal",
+            "amount": {
+              "const": 30
+            }
+          }
+        }
+      ],
+      "note": "脚下升起一圈光环，站在里面就回血"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "治疗",
+    "神圣"
+  ],
+  "rules": []
+}

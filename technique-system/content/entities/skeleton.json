@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "entity.skeleton",
+  "name": "骷髅兵",
+
+  "_comment": "内容里的第一个实体预设。它存在的理由是让 `spawn` 有东西可引用 —— 在那之前 EntityDef 这个类型是**零引用**的：声明在 schema 里、校验器认它、describe 会说「生成 entity.skeleton」，但没有一行代码读它。",
+
+  "_comment_faction": "⚠ faction 写 'caster' —— 意思是「跟召唤它的人同一阵营」。\n写死 'enemy' 的话，敌人召唤出来的骷髅会帮着玩家打；写死 'player' 反过来。\n这一条就是纪律 1（一切按阵营动态查询）在内容层的体现：\n和「魅惑」是同一件事的两面，两边都靠同一个 isHostile。",
+
+  "tags": ["undead", "summon"],
+  "faction": "caster",
+
+  "_comment_stats": "血只有 60，跑得快，伤害一般 —— 召唤物的定位是「替你挨几下、顺便磨一点血」，\n不是一个免费的 DPS。定价器按它的血量池算钱（见 pricing.ts 的 spawn 那一节）。",
+  "attributes": {
+    "char.hp.max": 60,
+    "char.energy.max": 40,
+    "char.energy.regen": 6,
+    "char.speed": 4.5
+  },
+
+  "techniques": ["tech.cleave"],
+
+  "_comment_ai": "preferredRange 1.6 = 贴脸。它没有保命技，也没有走位智慧 —— 廉价召唤就该是这样。",
+  "ai": {
+    "targetFaction": "enemyOfSelf",
+    "preferredRange": 1.6,
+    "thinkInterval": 0.35
+  },
+
+  "radius": 0.4
+}

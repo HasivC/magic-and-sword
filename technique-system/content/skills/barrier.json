@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.barrier",
+  "name": "屏障",
+  "note": "在你面前竖一道会挡子弹的墙。子弹从敌人那边打过来会被墙吃掉，你自己打出去的可以穿过去。墙有耐久，被打光就散，也可以自己到时间消失。它挡不住人 —— 想把人关在外面是另一件事。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "self"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：在自己身前点出屏障**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "phases": [
+    {
+      "id": "sow",
+      "name": "前摇",
+      "duration": 0.3,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 20
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "hold",
+      "name": "后摇",
+      "duration": 0.2,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "control"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "sow",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "spawn",
+            "entityId": "entity.barrier",
+            "count": 1,
+            "lifetime": 8
+          }
+        }
+      ],
+      "note": "在你点的地方竖一堵墙"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "防御",
+    "屏障"
+  ],
+  "rules": []
+}

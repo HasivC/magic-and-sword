@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.flame-wall",
+  "name": "火墙",
+  "note": "在鼠标点的那块地上烧起一片火，站在里面的人会持续挨烧。它长在地上、不在你身上，所以要提前放在敌人会走的位置。",
+  "targeting": {
+    "mode": "areapoint",
+    "valid": [
+      "enemy"
+    ],
+    "range": 8
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：场景注释点名\"点火地面\"**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "第一个用 `targeting.mode: 'areapoint'` 的技能 —— 点地面放，火墙长在你点的那块地上，不在你身上。\n\n这个模式以前是**惰性字段**：写上去和 directional 表现完全一样，还不报错。\n现在引擎真的按 mode 解析瞄准（src/sim/targeting.ts 的 resolveAim）。",
+  "_comment_range": "⚠ range 在这里不是「打得到多远」，而是「**落点最远能放多远**」。\n不写的话超出的落点不会被压回边缘（引擎里 `range > 0` 才钳制），\n玩家能隔着半张地图放火墙 —— 校验器会拦这一条。",
+  "_comment_delay": "⚠ 起手 0.3 秒不是装饰：点地面技能如果瞬间生效，会变成「点哪儿哪儿立刻爆」，\n没有任何躲避空间。给一段起手，对手才有机会走开。",
+  "phases": [
+    {
+      "id": "sow",
+      "name": "前摇",
+      "duration": 0.3,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 20
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "recover",
+      "name": "后摇",
+      "duration": 0.2,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "sow",
+      "then": [
+        {
+          "delivery": {
+            "kind": "area",
+            "radius": 2.5
+          },
+          "payload": {
+            "kind": "damage",
+            "amount": {
+              "const": 50
+            },
+            "damageType": "fire"
+          }
+        }
+      ],
+      "note": "在点的地方烧起一片火"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "范围",
+    "火"
+  ],
+  "rules": []
+}

@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.ws-slash",
+  "name": "横砍",
+  "note": "武器技能模板：一记横扫。够得着多远、打多痛，都读**武器属性** —— 所以同一份模板装在长剑和短匕上完全是两个手感。它是只读的：能改的只有怎么把它编进术式。",
+  "targeting": {
+    "mode": "directional",
+    "valid": [
+      "enemy"
+    ],
+    "range": 4
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**段 tech.ws-slash（两份容器里都是它）**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "readonly": true,
+  "_comment": "武器技能模板。⚠ `readonly: true` —— 编辑器里不给改（滑块都不显示）。\n\n玩家 2026-09-21 定的：\n  > 武器技能（横批、旋转斩、刺击等等）是**不能**在编辑器修改属性的，\n  > 每种武器的技能范围和伤害也因为属性不同而不同……\n  > 玩家能改的只有它们**如何组成武器术式**。\n\n所以这一份是**全局共享的模板**：所有用横砍的武器都用它，\n差别全在 `ref: weapon.*` 代入进去的值上。",
+  "_comment_ref": "⚠ `ref: weapon.reach` 是**这把武器**的打得到多远，不是持有者的属性。\n命名空间是 weapon.* 而不是 char.*：后者是**人**的属性（血量上限、移速）。\n混在一起会分不清\"这把剑更长\"和\"这个人跑得更快\"。",
+  "_comment_damage": "伤害用曲线把武器倍率翻译成点数：1× → 25，2× → 50。\n写曲线而不是直接乘，是因为 ValueSpec 能表达的只有「常量」或「引用 + 一条曲线」。",
+  "phases": [
+    {
+      "id": "windup",
+      "name": "前摇",
+      "duration": 0.15,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "damage"
+    },
+    {
+      "id": "swing",
+      "name": "命中",
+      "duration": 0.2,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "control"
+    },
+    {
+      "id": "recover",
+      "name": "后摇",
+      "duration": 0.2,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "interrupt": "control"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "swing",
+      "then": [
+        {
+          "delivery": {
+            "kind": "meleeArc",
+            "vfx": "fx.slash",
+            "radius": {
+              "ref": "weapon.reach"
+            },
+            "angle": 120
+          },
+          "payload": {
+            "kind": "damage",
+            "amount": {
+              "ref": "weapon.damage",
+              "curve": [
+                [
+                  1,
+                  25
+                ],
+                [
+                  2,
+                  50
+                ]
+              ]
+            },
+            "damageType": "physical"
+          }
+        }
+      ],
+      "note": "一记横扫"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "武器技能",
+    "近战"
+  ],
+  "_comment_geometry": "⚠ 扇形半径**读的是武器射程**（`ref: 'weapon.reach'`）。\n这就是「每种武器的技能范围因为属性不同而不同」：\n同一份横砍，铁剑（reach 2.2）扫到 2.2 米，长剑（reach 3）扫到 3 米。\n\n张角反而是写死的 120°：没有 `weapon.angle` 这种东西 ——\n武器的长短不改变招式张开多大。\n\n⚠ 引擎里三处读同一个 ref（targeting 的命中判定、pipeline 的事件、fx 的画），\n解析出来的必须是同一个值：判定 3 米、特效画 2 米的话，\n\"够得着\"和\"看着够得着\"就分家了。",
+  "rules": []
+}

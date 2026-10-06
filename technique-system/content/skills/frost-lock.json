@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.frost-lock",
+  "name": "寒冰锁",
+  "note": "发出一道冰锥，命中后把对方冻住：动不了、打不了、也转不了身。伤害不高，价值全在那一下控制。",
+  "targeting": {
+    "mode": "directional",
+    "valid": [
+      "enemy"
+    ],
+    "range": 12
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**术式 tech.frost-lock**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "第一个用 disables 的技能（冻结）。引擎里 disables 一直是零内容：它能禁用 move / attack / cast / turn 四种能力，而没有任何技能用过。",
+  "_comment_why_not_damage": "它伤害不高（25），因为它的价值在控制。点数账里'禁用四种能力 1.5 秒'本身就是一大笔支出，再叠高伤害就会变成超模技能 —— 那种东西应该走血契，而不是伪装成一个普通技能。",
+  "phases": [
+    {
+      "id": "sign",
+      "name": "前摇",
+      "duration": 0.3,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 40
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "release",
+      "name": "命中",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "release",
+      "note": "一道冰锥打出去",
+      "then": [
+        {
+          "delivery": {
+            "kind": "projectile",
+            "speed": 12,
+            "lifetime": 1.5,
+            "radius": 0.5
+          },
+          "payload": {
+            "kind": "damage",
+            "amount": {
+              "const": 25
+            },
+            "damageType": "ice"
+          }
+        }
+      ]
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "控制",
+    "冰"
+  ],
+  "rules": [
+    {
+      "id": "r2",
+      "note": "冻住：四种能力一起禁",
+      "when": "onHit",
+      "then": [
+        {
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.frozen",
+              "name": "冻结",
+              "_comment": "hardCC 这个标签是必须的 —— 霸体（铁布衫）就是按标签免疫的。不打标签的话，冻结算不上控制，霸体挡不住它，校验器也会警告。",
+              "tags": [
+                "debuff",
+                "hardCC",
+                "ice"
+              ],
+              "duration": 1.5,
+              "_comment_disables": "四种能力全禁 = 完全不能动。少写一个都会漏：不写 turn 的话，被冻住的人还能转身面向你，『被冻住还能瞄准』很出戏。",
+              "disables": [
+                "move",
+                "attack",
+                "cast",
+                "turn"
+              ],
+              "removal": {
+                "expires": true,
+                "immuneTo": []
+              },
+              "vfx": "fx.frozen"
+            }
+          }
+        }
+      ],
+      "order": 0
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.frost-lock",
+  "name": "寒冰锁",
+  "activation": "press",
+  "skills": [
+    "skill.frost-lock"
+  ],
+  "tags": [
+    "控制",
+    "冰"
+  ],
+  "kind": "magic"
+}

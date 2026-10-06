@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>术式系统</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; height: 100%;
+      background: #0d1017; color: #c9d1d9;
+      font: 13px/1.5 ui-monospace, Consolas, "Cascadia Mono", monospace;
+      overflow: hidden;
+    }
+    #stage { display: block; width: 100vw; height: 100vh; cursor: crosshair; }
+    #overlay {
+      position: fixed; inset: 0; pointer-events: none; z-index: 5;
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 14px 18px;
+    }
+    /* 编辑器打开时把左右两侧的面板推开 —— 不然它们会盖在编辑器上 */
+    #top, #bottom { transition: padding-left .15s ease; }
+    body.editing #top, body.editing #bottom { padding-left: 462px; }
+    #top { display: flex; justify-content: space-between; gap: 24px; }
+    #bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+    .panel {
+      background: #0d1017cc; border: 1px solid #21262d; border-radius: 6px;
+      padding: 8px 12px; backdrop-filter: blur(4px);
+    }
+    h1 { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: #e6edf3; }
+    .dim { color: #6e7681; }
+    .ok { color: #3fb950; }
+    .bad { color: #f85149; }
+    .warn { color: #d29922; }
+    .key { display: inline-block; min-width: 18px; text-align: center;
+           background: #21262d; border-radius: 3px; padding: 0 5px; margin-right: 6px; }
+    #skills div { margin-top: 3px; }
+    #toast {
+      position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%);
+      color: #f85149; font-weight: 600; opacity: 0; transition: opacity .25s;
+      pointer-events: none; z-index: 20;
+    }
+    #toast.show { opacity: 1; }
+
+    /* ---------------- 编辑器 ---------------- */
+    /*
+     * ⚠ 2026-10-06（编辑器 UI 第一片）：面板从 460px 放宽到 min(1024px, 96vw)。
+     *   理由是**技能页按用户给的设计模板（`ui-mockups/editor-v2.html`）排**——
+     *   模板那一屏是"左边技能库 + 右边详情（346px）"，460px 装不下，
+     *   左边会被压到一百来个像素。窄屏时下面那些 `flex-wrap` 会自己折成上下两段。
+     *   ⚠ 副作用：术式页（下一个片）也一起变宽了 —— 它的布局是流式的，不会坏，
+     *     但"要不要跟着重新排"留给做术式页的那一片决定。
+     */
+    #editor {
+      position: fixed; top: 0; left: 0; bottom: 0; width: min(1024px, 96vw); z-index: 10;
+      background: #0d1017f2; border-right: 1px solid #21262d;
+      display: flex; flex-direction: column;
+      transform: translateX(-100%); transition: transform .15s ease;
+      backdrop-filter: blur(6px);
+    }
+    #editor.open { transform: translateX(0); }
+    #editor header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; border-bottom: 1px solid #21262d;
+    }
+    #editor header b { color: #e6edf3; }
+    #editor select {
+      flex: 1; background: #161b22; color: #c9d1d9;
+      border: 1px solid #30363d; border-radius: 4px; padding: 4px 6px;
+      font: inherit;
+    }
+    #editor .scroll { flex: 1; overflow-y: auto; padding: 12px 14px 30px; }
+
+    /*
+     * ⚠ 2026-10-07（编辑器 UI 第二片）：`.group` / `.row` 那套**不再用于技能页**了。
+     *   用户原话是「绝大部分 UI 没有按照模板来」—— 指着的是"没有一整块一整块卡片的外观"。
+     *   模板（`ui-mockups/editor-v2.html`）里那三组控件是一张张 `.row` 卡片：
+     *   **自己的边框 + 圆角 + 留白 + 标题**（模板 css：`.row{border:1px solid var(--line);
+     *   border-radius:10px;background:var(--panel2);padding:12px}`）。
+     *   所以技能页改用 `sk-card` / `sk-field`（下面「技能页」那一段，数值照模板搬）。
+     *   这两条留着是给**别的**地方兜底（术式页走自己那套 `te-`）。
+     */
+    .group { margin-bottom: 18px; }
+    .group > h2 {
+      margin: 0 0 8px; font-size: 11px; font-weight: 600; letter-spacing: .08em;
+      color: #6e7681; text-transform: uppercase;
+    }
+    .row { margin-bottom: 9px; }
+    .row .label { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
+    .row .label span:last-child { color: #e6edf3; font-weight: 600; }
+    .row .hint { color: #6e7681; font-size: 11px; }
+    input[type=range] { width: 100%; accent-color: #58a6ff; }
+    label.check { display: flex; align-items: center; gap: 7px; cursor: pointer; margin-bottom: 8px; }
+    label.check input { accent-color: #58a6ff; }
+
+    /* 点数条：编辑器的主视觉，编辑器里任何东西都不能只改效果、不显示价格 */
+    #points { margin-bottom: 14px; }
+    #points .bar { position: relative; height: 10px; background: #161b22; border-radius: 5px; overflow: hidden; }
+    #points .gain { position: absolute; top: 0; bottom: 0; left: 50%; background: #3fb950; }
+    #points .cost { position: absolute; top: 0; bottom: 0; right: 50%; background: #f85149; }
+    #points .meta { display: flex; justify-content: space-between; margin-top: 5px; }
+    /* 「点数是什么」的说明。上一版没写，玩家看不懂这一条是干什么的 */
+    #points .hint {
+      margin-top: 6px; padding: 7px 9px;
+      background: #161b22; border-left: 2px solid #30363d; border-radius: 0 4px 4px 0;
+      color: #8b949e; font-size: 11px; line-height: 1.6;
+    }
+    #points .hint b { color: #c9d1d9; }
+
+    /* 通用说明条：技能挂在哪个术式上、文件名放哪儿 */
+    .group > .hint { color: #6e7681; font-size: 11px; margin: -3px 0 8px; }
+    .group > .hint code { background: #161b22; padding: 1px 4px; border-radius: 3px; }
+
+    /*
+     * 技能介绍：一进技能页就先看到"这个技能是干什么的"。
+     *
+     * ⚠ 玩家 2026-09-21 要的（「技能要在编辑器中有技能介绍」）：
+     *   以前一进来就是点数条和一堆滑块 —— 看得到"有哪些数字"，
+     *   看不到"它做什么"。这里的两块（一句话 + 时间线）都是**算出来的**，
+     *   改了数值它自己跟着变。
+     */
+    .intro { border-left: 2px solid #1f6feb; padding-left: 10px; }
+    .intro h2 { margin-bottom: 6px; }
+    .intro-rules { margin: 0 0 8px; padding-left: 18px; color: #c9d1d9; }
+    .intro-rules li { margin-bottom: 2px; }
+    .intro-timeline {
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px;
+      font-size: 12px; color: #8b949e; margin-bottom: 8px;
+    }
+    .intro-timeline .step { background: #161b22; padding: 2px 6px; border-radius: 3px; }
+    .intro-timeline .arrow { color: #484f58; }
+
+    .issue { font-size: 12px; margin-bottom: 6px; }
+    .issue .code { color: #484f58; }
+    .issue .path { color: #6e7681; }
+    .issue .msg { display: block; }
+    .issue .hint { color: #6e7681; }
+
+    /*
+     * 规则列表：编辑器的主体交互 —— 「新增一条规则」是主动词。
+     *
+     * ⚠ 中间那句话是**生成的**（src/describe.ts），不是 JSON 里的 note。
+     *   手写的说明会和数值脱节：玩家把"回复 8 点生命"拖成 20，它还写着 8。
+     *   note 只作为设计意图挂在后面（.intent，小字、灰色）。
+     *
+     * ⚠ 2026-10-07：观感照模板（10px 圆角、`#1c2129` 底、`8px 10px` 留白）——
+     *   和用户点名的那些卡片是同一个体系，只是更紧凑（它是卡片**里面**的一行）。
+     */
+    .rule {
+      display: flex; align-items: baseline; gap: 8px;
+      padding: 8px 10px; margin-bottom: 7px;
+      background: #1c2129; border: 1px solid #30363d; border-radius: 10px;
+    }
+    .rule .desc { flex: 1; }
+    .rule .intent { color: #6e7681; font-size: 11px; margin-left: 6px; }
+    .rule .pts { font-weight: 600; }
+    .rule button {
+      background: none; border: 0; color: #6e7681; cursor: pointer;
+      font: inherit; padding: 0 3px;
+    }
+    .rule button:hover { color: #f85149; }
+
+    /* 滑块的档位刻度：两端各写一个数，让人知道"能拖到哪" */
+    .scale {
+      display: flex; justify-content: space-between;
+      color: #484f58; font-size: 10px; margin-top: -2px;
+      /* ⚠ 档位刻度是贴在滑块底下的（负 margin），底色必须透明 —— 不然会割断卡片 */
+      background: transparent;
+    }
+    /* 当前值不在推荐档位上（出厂内容不该出现，手写 JSON 可能出现） */
+    .offgrid { color: #d29922; cursor: help; }
+
+    /* 阶段块：打断等级是三选一，不是勾选框 */
+    .phase-block {
+      border: 1px solid #30363d; border-radius: 10px; background: #1c2129;
+      padding: 10px 12px; margin-bottom: 10px;
+    }
+    .phase-block .phase-name { color: #e6edf3; font-weight: 600; margin-bottom: 6px; }
+    .phase-block label.check { margin-bottom: 3px; }
+    .phase-block input[type=radio] { accent-color: #58a6ff; }
+
+    /*
+     * 冷却时机：技能**唯一**的冷却 —— 选一个时机 + 一个秒数。
+     * ⚠ 观感照模板的胶囊按钮（8px 圆角，模板 `button.ghost` 那一套）。
+     */
+    .cd-choice { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .cd-choice button {
+      background: #21262d; border: 1px solid #30363d; border-radius: 8px;
+      color: #8b949e; font: inherit; font-size: 12.5px; padding: 6px 10px; cursor: pointer;
+    }
+    .cd-choice button:hover { border-color: #3d444d; color: #e6edf3; }
+    .cd-choice button.on {
+      border-color: #58a6ff; color: #e6edf3; background: #0d1117;
+    }
+
+    /*
+     * 身上那串状态：鼠标移上去看说明（玩家 2026-09-21 记的待办）。
+     *
+     * ⚠ 浮层默认 `display: none`，靠 CSS 的 `:hover` 显示 ——
+     *   **不用 JS 监听鼠标**：状态行是每帧都在更新的 DOM，
+     *   挂 mouseenter/mouseleave 得在每次重建时重新挂，很容易漏。
+     *
+     * ⚠ **`pointer-events: auto` 是必须的**：整个 HUD 那一层是
+     *   `pointer-events: none`（不然它挡住鼠标瞄准），而那是**继承**的 ——
+     *   不单独打开的话状态行收不到 hover，浮层永远不出现。
+     *   （这个坑真踩了：第一版只写了 `:hover` 的样式，玩家反馈"悬停没有出现"。）
+     *   只给状态行开，别的地方照样点得穿。
+     */
+    [data-hud-status-row] { position: relative; cursor: help; pointer-events: auto; }
+    [data-hud-status-row] .status-tip {
+      display: none;
+      position: absolute; left: 0; top: 100%; z-index: 30;
+      width: max-content; max-width: 260px;
+      margin-top: 3px; padding: 6px 8px;
+      background: #0d1117; border: 1px solid #30363d; border-radius: 5px;
+      color: #c9d1d9; font-size: 11px; line-height: 1.5;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .5);
+      white-space: normal; text-align: left;
+    }
+    [data-hud-status-row]:hover .status-tip { display: block; }
+
+    /*
+     * ⚠ 2026-10-07：按钮的观感照模板的 `button.ghost` 那一套
+     *   （`#21262d` 底 + `#30363d` 边 + **8px 圆角** + `9px 12px` 留白）。
+     *   上一片用的是 4px 圆角 + `4px 10px` —— 那是老编辑器那一代的尺寸，
+     *   摆在卡片（12px 圆角）里一眼就不是一个体系。
+     */
+    .palette { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .palette button {
+      background: #21262d; border: 1px solid #30363d; border-radius: 8px;
+      color: #c9d1d9; font: inherit; font-size: 12.5px; padding: 5px 10px; cursor: pointer;
+    }
+    .palette button:hover { border-color: #3d444d; background: #262d36; color: #e6edf3; }
+    .palette .gain:hover { border-color: #3fb950; }
+    .palette .cost:hover { border-color: #f85149; }
+
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions button {
+      background: #21262d; border: 1px solid #30363d; border-radius: 8px;
+      color: #c9d1d9; font: inherit; font-size: 12.5px; padding: 7px 11px; cursor: pointer;
+    }
+    .actions button:hover { border-color: #3d444d; background: #262d36; }
+    textarea {
+      width: 100%; height: 180px; margin-top: 8px; resize: vertical;
+      background: #0d1017; color: #8b949e; border: 1px solid #21262d;
+      border-radius: 4px; padding: 8px; font: 11px/1.4 ui-monospace, Consolas, monospace;
+    }
+
+    /* ---------------- 编辑器页签 ---------------- */
+    #editor .tabs { display: flex; gap: 4px; }
+    #editor .tab {
+      background: #161b22; border: 1px solid #30363d; border-radius: 4px;
+      color: #8b949e; font: inherit; padding: 4px 9px; cursor: pointer;
+    }
+    #editor .tab:hover { border-color: #58a6ff; color: #e6edf3; }
+    #editor .tab.on { border-color: #58a6ff; background: #1c2733; color: #e6edf3; }
+
+    /* ---------------- 术式编辑器 ---------------- */
+    /*
+     * ⚠ 这一页的主视觉是**下面那条账**，不是工具条。
+     *   玩家的循环是"加一个强零件 → 账面变负 → 加一个代价零件 → 回到 0"，
+     *   所以合计必须一直可见、够大、能一眼看出还差多少。
+     */
+    .te-bar { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 12px; }
+    .te-bar select {
+      background: #161b22; color: #c9d1d9; border: 1px solid #30363d;
+      border-radius: 4px; padding: 3px 6px; font: inherit; max-width: 150px;
+    }
+    .te-bar button {
+      background: #21262d; border: 1px solid #30363d; border-radius: 4px;
+      color: #c9d1d9; font: inherit; padding: 3px 8px; cursor: pointer;
+    }
+    .te-bar button:hover { border-color: #58a6ff; }
+    .te-slot { margin-left: auto; color: #8b949e; font-size: 11px; }
+
+    .te-meta {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      padding: 8px 10px; margin-bottom: 12px;
+      background: #161b22; border: 1px solid #21262d; border-radius: 4px;
+    }
+    .te-meta label { color: #8b949e; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+    .te-meta input[type=text], .te-meta input:not([type]) {
+      background: #0d1017; color: #e6edf3; border: 1px solid #30363d;
+      border-radius: 4px; padding: 3px 6px; font: inherit;
+    }
+    .te-meta input[type=number] {
+      background: #0d1017; color: #e6edf3; border: 1px solid #30363d;
+      border-radius: 4px; padding: 3px 6px; font: inherit; width: 62px;
+    }
+    .te-meta select {
+      background: #161b22; color: #c9d1d9; border: 1px solid #30363d;
+      border-radius: 4px; padding: 3px 6px; font: inherit;
+    }
+    .te-meta label.need { color: #d29922; }
+    .te-valid { display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+      color: #8b949e; font-size: 12px; }
+    .te-chip { display: flex; align-items: center; gap: 3px; }
+
+    .te-chain-head { color: #8b949e; font-size: 11px; letter-spacing: .06em; margin-bottom: 6px; }
+    .te-chain { margin-bottom: 12px; }
+
+    .te-seg {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 9px; background: #161b22;
+      border: 1px solid #30363d; border-radius: 4px;
+    }
+    .te-seg.bad { border-color: #f85149; }
+    .te-n { color: #6e7681; font-weight: 600; }
+    .te-name { flex: 1; color: #e6edf3; }
+    .te-val { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .te-val.gain { color: #f85149; }
+    .te-val.cost { color: #3fb950; }
+    .te-ops { display: flex; gap: 2px; }
+    .te-ops button {
+      background: none; border: 0; color: #6e7681; cursor: pointer; font: inherit; padding: 0 4px;
+    }
+    .te-ops button:hover { color: #58a6ff; }
+
+    .te-gate {
+      margin: 4px 0 4px 16px; padding: 5px 8px;
+      border-left: 2px dashed #30363d;
+    }
+    .te-gate-head { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+    .te-gate-title { color: #8b949e; font-size: 11px; }
+    .te-gate-head button {
+      background: none; border: 1px solid #30363d; border-radius: 3px;
+      color: #8b949e; font: inherit; font-size: 11px; padding: 1px 6px; cursor: pointer;
+    }
+    .te-gate-head button:hover { border-color: #58a6ff; color: #e6edf3; }
+    .te-gate-sum { color: #6e7681; font-size: 11px; margin-top: 2px; }
+    .te-cond { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-bottom: 3px; }
+    .te-cond select, .te-cond input {
+      background: #161b22; color: #c9d1d9; border: 1px solid #30363d;
+      border-radius: 3px; padding: 2px 5px; font: inherit; font-size: 12px;
+    }
+    .te-cond input[type=number] { width: 60px; }
+    .te-cond button {
+      background: none; border: 0; color: #6e7681; cursor: pointer; font: inherit; padding: 0 3px;
+    }
+    .te-cond button:hover { color: #f85149; }
+
+    .te-lib { margin-bottom: 12px; }
+    .te-lib summary { color: #58a6ff; cursor: pointer; font-size: 12px; }
+    .te-lib-hint { font-size: 11px; margin: 6px 0; line-height: 1.5; }
+    .te-lib-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+    .te-part {
+      display: flex; align-items: baseline; gap: 6px;
+      background: #161b22; border: 1px solid #30363d; border-radius: 4px;
+      color: #c9d1d9; font: inherit; padding: 4px 8px; cursor: pointer;
+    }
+    .te-part:hover { border-color: #58a6ff; }
+    .te-part-tag { font-size: 10px; }
+
+    .te-ledger {
+      padding: 10px 12px; background: #0d1017;
+      border: 1px solid #30363d; border-radius: 4px;
+    }
+    .te-total { display: flex; align-items: baseline; gap: 8px; }
+    .te-total-num { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .te-total-num.gain { color: #f85149; }
+    .te-total-num.cost { color: #3fb950; }
+    .te-verdict { margin: 6px 0 10px; font-size: 12px; line-height: 1.6; }
+    .te-verdict.ok { color: #3fb950; }
+    .te-verdict.warn { color: #d29922; }
+    .te-verdict.bad { color: #f85149; }
+    /* 负值术式：不是错误，是一条"花血契"的路 —— 用紫色，和红色的错误分开 */
+    .te-verdict.negative { color: #c678dd; }
+    .te-row { display: flex; align-items: baseline; gap: 8px; font-size: 12px; padding: 1px 0; }
+    .te-row .te-name { color: #8b949e; }
+    .te-entries { margin-top: 8px; }
+    .te-entries summary { color: #6e7681; font-size: 11px; cursor: pointer; }
+    .te-detail-row { font-size: 11px; color: #8b949e; padding: 1px 0; }
+    .te-detail-row .te-val { display: inline-block; min-width: 52px; }
+
+    /* ---------------- 技能页（编辑器 UI 第二片，照 ui-mockups/editor-v2.html 的**观感**） ----------------
+     *
+     * ⚠ 命名前缀 `sk-` 是**故意的**：术式页用 `te-`，两边一眼分得开。
+     *   模板里的类名（`.lib` / `.cell` / `.detail` / `.foot`）在别的 CSS 里
+     *   已经出现过（HUD 那些），直接抄会串味。
+     *
+     * ⚠⚠ 2026-10-07：这一段的**数值全部照模板的 CSS 搬**（不是"信息结构照了就行"）。
+     *   用户的话是「绝大部分 UI 没有按照模板来」—— 上一片只搬了结构，
+     *   于是观感还是老编辑器那套（4~5px 圆角、`#161b22` 底、挤在一起的间距）。
+     *   对照表（模板 → 这里）：
+     *     `.win`        → `#editor`（12px 圆角那一套体系 / 面板底色）
+     *     `.search`     → `.sk-search`（`#0d1117` 底 + 7px 圆角 + 12.5px 字号）
+     *     `.grouphead`  → `.sk-grouphead`（12.5px 粗体 + 8px 方点 + 计数灰字）
+     *     `.grid/.cell` → `.sk-grid/.sk-cell`（`minmax(84px)` / 10px gap / 10px 圆角 / hover 抬 2px）
+     *     `.icon/.tag`  → `.sk-icon/.sk-tag`（46px 图标 + 16px 角标 = 模板的 46/16）
+     *     `.detail`     → `.sk-detail`（右栏，`--panel2` 底；**照模板写死 346px**，
+     *                      不许弹性 —— 弹性的宽/高会随选中的技能变，见下面那一条）
+     *     `.dname/.pill`→ `.sk-dname/.sk-pill`（17px 名 + 99px 胶囊）
+     *     `table.num`   → `.sk-num`（`#232a33` 分隔线 / 右列 tabular-nums）
+     *     `.dact`       → `.sk-dact`（`margin-top:auto` 把动作按钮压到底）
+     *     `.edit/.mainhead/.foot` → `.sk-editscreen/.sk-edithead/.sk-foot`
+     *     `.row` 卡片   → `.sk-card`（**用户点名的"一整块一整块"**：10px 圆角 + `--panel2` 底 + 12px 留白）
+     *     `button.primary/.ghost/.sm` → `.sk-primary`（照抄模板那套颜色与 8px 圆角）
+     *
+     * ⚠ `.sk-*` 是**公共**部分：术式页（下一片）直接复用这一段的卡片 / 胶囊 / 按钮 / 格子。
+     */
+    /*
+     * ⚠⚠ 2026-10-06（用户实测第 3 条：「改成满高，技能详情也是」）：
+     *   技能页那两栏要**吃满可用的高度**，所以高度是一条**确定的**链，一层层传下来：
+     *
+     *     `#editor`（`position:fixed; top:0; bottom:0` ⇒ 外框高 = 视口高）
+     *       → `#editorBody`（`flex:1` ⇒ 高 = 编辑器高 − 顶栏 − 它自己的上下 padding）
+     *         → `.sk-page`（`height:100%` = 父的**内容框**高）
+     *           → `.sk-cols`（`height:100%`，就是下面那个行容器）
+     *
+     *   ⚠ 链上每一环都是**布局确定量**（视口 / flex 分配 / 百分比），**没有一处**
+     *     依赖字体排版 —— 这正是用户点名要的"能确证的量"。
+     *     上一版是 `62vh`：那是**视口**的比例，而这一栏真正能用的是
+     *     "编辑器高 − 顶栏 − 上下 padding"，两者不是一回事 ⇒ 既没吃满，也不齐。
+     *   ⚠ `* { box-sizing:border-box }` 是全局的 ⇒ 这里的 100% 指的是
+     *     `#editorBody` 的**内容框**，而它的上下 padding（12 + 30）在内容框外面
+     *     ⇒ 合起来正好等于 `#editorBody` 的高度，**不会多出一条整页滚动条**。
+     */
+    .sk-page { display: block; height: 100%; }
+    /* 左边技能库 + 右边详情；窄的时候自己折成上下两段（模板是左右两栏） */
+    /* ⚠ 折行只由**容器宽度**决定（窄屏才折），跟"选中了哪一份技能"无关 ——
+     *   详情那一栏是固定 346px 的（见 `.sk-detail`），所以列表 / 详情 / 编辑区
+     *   三者的相对位置不会因为选谁而变化。 */
+    /*
+     * ⚠⚠ 2026-10-06：行容器**自己有确定高度**（`height:100%`，来源见上面 `.sk-page`）；
+     *   两栏再各自 `height:100%`（逐字相同的表达式）⇒ 两栏的高 = 这同一个确定值
+     *   ⇒ 在同一个 flex 行里、都从行首开始 ⇒ **底边必然重合**，不是"看着齐"。
+     *   ⚠ `align-items:flex-start` 留着：栏的**高度**由 `height:100%` 给（不由 stretch 给），
+     *     这条管的是列方向上的对齐起点，跟"满高"不冲突。
+     */
+    .sk-cols {
+      display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start;
+      height: 100%;
+    }
+    /*
+     * ⚠⚠ 2026-10-06（用户实测「面板对齐」→ 这一版「满高」）：**左栏整栏吃满行容器**。
+     *   高度 = `100%`（父给的确定值），和右栏 `.sk-detail` 用的是**同一个表达式**，
+     *   所以同一个 flex 行里两栏的外框高相等、都从行首开始 ⇒ **底边必然重合**。
+     *   （第 9 行 `* { box-sizing: border-box }` ⇒ 这 100% 指的是**外框**高：右栏那
+     *     16px 留白和 1px 边都在里面，不会把它的底边往下推。）
+     *
+     *   老写法为什么两栏底边不齐：`.sk-libbody` 自己写死 `max-height:62vh`，
+     *   而左栏上面还有搜索框 ⇒ 左栏实际高 = `搜索框 + 12px + 62vh`，比右栏**高一截**。
+     *   再上一版把 62vh 挪到左栏身上（搜索框从这 62vh 里吃掉一块）：底边齐了，
+     *   但**列表矮了约一个搜索框** —— 那正是用户这一次点名的第 3 条。
+     *
+     *   为什么不用"把右栏补成 `calc(62vh + 搜索框高度)`"：搜索框的高度是**字体排版**
+     *   算出来的（字体回退不同就不同），拿一个估出来的数去补，本质还是"看起来差不多"——
+     *   而这条正是用户点名不许靠的那一种（沙箱里起不了浏览器，肉眼看不了）。
+     *   现在改成"父容器给多少就吃多少"：搜索框吃掉它自己那一块、列表用剩下的，
+     *   两栏的外框高都是同一个确定值，**没有一处是估的**。
+     *
+     *   ⚠ `overflow-y:auto` 是给这一栏**自己**兜底的（内容真超出时在这一栏内部滚）；
+     *     列表的日常滚动仍然是它内部那个 `.sk-libbody`（它也 `overflow-y:auto`）——
+     *     ⇒ 面板自己不随内容长大，也不会把整页顶出滚动条。
+     */
+    .sk-lib {
+      flex: 1 1 260px; min-width: 0;
+      display: flex; flex-direction: column; height: 100%; min-height: 0;
+      overflow-y: auto;
+    }
+    /* 列表**填满左栏剩下的那一块** —— 自己**不写高度**（写了就等于又给左栏留了一条估出来的高） */
+    .sk-libbody { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-right: 4px; }
+    .sk-search {
+      width: 100%; margin-bottom: 12px; padding: 7px 10px;
+      background: #0d1117; border: 1px solid #30363d; border-radius: 7px;
+      color: #e6edf3; font-size: 13px; font: inherit;
+    }
+    .sk-search:focus { outline: none; border-color: #3d444d; }
+    .sk-grouphead {
+      display: flex; align-items: center; gap: 8px; margin: 6px 0 10px;
+      color: #8b949e; font-weight: 700; font-size: 12.5px;
+    }
+    .sk-grouphead .sk-dot { width: 8px; height: 8px; border-radius: 3px; }
+    .sk-grouphead .sk-n { color: #6e7681; font-weight: 400; }
+    /*
+     * ⚠⚠ 2026-10-07（用户实测第 2 条）：术式库里 `常驻术式` / `主动术式`
+     *   **不是**和 `武器术式` / `魔法术式` 平级的东西 —— 它们是**魔法术式下面**
+     *   那一层。用户原话：「常驻和主动术式是在魔法术式下的分组，而不是和魔法术式同级」。
+     *
+     *   ⇒ 一级（`.sk-grouphead`）和二级（`.sk-subhead`）**各是一个类**，
+     *     四条标题绝不共用一个样式：共用一个样式正是他看到"像四个平级"的原因。
+     *   ⇒ 从属用三件事一起说：**更小**的字 + **更淡**的颜色 + **没有那个 8px 大方点**
+     *     （换成一条 10px 的短横）。
+     *   ⚠ 2026-10-06（**新的一条**用户实测；上面那一段是 2026-10-07 那次的）：
+     *     原来那三件事里还有"缩进 + 左边一道竖线"，现在**删掉了**
+     *     （用户原话：「二级术式**不要缩进**」）—— 剩下上面这三件，
+     *     见下面 `.sk-subhead` 那一段。
+     *   ⚠ 分组依据不变（还是引擎报的 `activation === 'auto'`，见 technique-editor.ts
+     *     的 `isPermanent`）；这里改的**只是它在树上挂在哪一层**。
+     */
+    .sk-group { min-width: 0; }
+    /*
+     * ⚠⚠ 2026-10-06（用户实测第 2 条）：二级**不缩进**。
+     *   用户原话：「二级术式**不要缩进**」。
+     *
+     *   原来这一条是 `margin-left:14px; padding-left:10px; border-left:2px solid …`
+     *   （缩进和右侧那一条竖线是一套，一起表示"我从属"）—— 现在**整条规则删掉**：
+     *   二级标题和它下面那几行都和一级**左对齐**，`margin-left` / `padding-left` /
+     *   `border-left` 一个都没有，连规则本身都不在样式里（缩进没有地方能藏）。
+     *
+     *   ⚠ `.sk-subgroup` 这个**类名保留**（DOM 里还挂着它）：测试靠它认
+     *     "常驻 / 主动挂在魔法术式那一组**里面**"这个**结构**。
+     *     去掉的是观感，不是结构。
+     *
+     *   ⇒ 层级改由三件事一起说（一条缩进都不占）：
+     *       1. 字号**更小**：11.5px < 一级的 12.5px；
+     *       2. 颜色**更淡**：#6e7681 < 一级的 #8b949e（同一个深底上）；
+     *       3. 标记是**短横** `.sk-subdot`（10×2），不是一级那个 8px 大方点 `.sk-dot`。
+     */
+    .sk-subhead {
+      display: flex; align-items: center; gap: 6px; margin: 8px 0;
+      color: #6e7681; font-weight: 600; font-size: 11.5px;
+    }
+    .sk-subhead .sk-subdot { width: 10px; height: 2px; border-radius: 1px; flex: none; }
+    .sk-subhead .sk-n { color: #6e7681; font-weight: 400; font-size: 11px; }
+    .sk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 10px; margin-bottom: 20px; }
+    .sk-cell {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 8px 6px 6px; background: #1c2129; border: 1px solid #30363d;
+      border-radius: 10px; cursor: pointer; transition: .12s;
+    }
+    .sk-cell:hover { transform: translateY(-2px); border-color: #3d444d; }
+    /* 选中 = 描一圈「基础蓝」（模板 `.cell.on`）—— 颜色不是装饰，它说明"现在在看谁" */
+    .sk-cell.on { border-color: #58a6ff; box-shadow: inset 0 0 0 1px #58a6ff; }
+    .sk-icon {
+      position: relative; width: 46px; height: 46px; border-radius: 10px;
+      display: grid; place-items: center; font-size: 19px; font-weight: 700; color: #0d1117;
+    }
+    .sk-icon .sk-tag {
+      position: absolute; right: -5px; bottom: -5px; width: 16px; height: 16px;
+      border-radius: 6px; border: 2px solid #1c2129; display: grid; place-items: center;
+      font-size: 9px; font-weight: 800; color: #0d1117;
+    }
+    .sk-nm {
+      font-size: 11.5px; color: #8b949e; max-width: 78px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .sk-cell.on .sk-nm { color: #e6edf3; }
+    .sk-empty { color: #6e7681; font-size: 12px; margin: 2px 0 12px; }
+
+    /* ---------------- 术式页（编辑器 UI 第三片，照 ui-mockups/editor-v2.html 的**观感**） ----------------
+     *
+     * ⚠ 一律**复用上面那一段 `sk-`**（卡片 / 胶囊 / 按钮 / 格子 / 详情 ——
+     *   上一片建它们的时候就是给这一页留的）。只有下面这几条是**技能页没有、术式页才要**的，
+     *   全部照模板**数值原样搬**。对照表（模板 → 这里）：
+     *     `.row2`        → `.sk-row2`（术式库那一行：11px 12px 留白 / 10px 圆角 / hover 往右推 2px）
+     *     `.row2 .nm`    → `.sk-row2 .sk-nm2`（`min-width:150px` 那一列）
+     *     `.row2 .meta`  → `.sk-row2 .sk-meta`（12.5px 灰字、`gap:14px`）
+     *     `.pts`         → `.sk-pts`（`margin-left:auto` + tabular-nums + 四档颜色）
+     *     `.lib`         → `.sk-libcol`（左边那一条窄技能库：214px / `--panel2` 底 / 自己滚）
+     *     `.chip`        → `.sk-chip2`（库里的零件条：`#0d1117` 底 + 8px 圆角 + 20px 方标）
+     *     `.slot`        → `.sk-slot`（58×58 正方形空位 / 虚线 / 10px 圆角）
+     *     `.seq`         → `.sk-seq`（一条序列 = `--panel2` 底 + 12px 圆角 + 12px 留白）
+     *     `.seqhead .idx`→ `.sk-seq-idx`（24×24 / 7px 圆角）
+     *
+     * ⚠ `.sk-nm2` 这个名字是**故意错开** `.sk-nm` 的（那是技能页格子的名字，
+     *   `max-width:78px` 省略号那一套）—— 两个都叫 `.sk-nm` 的话，
+     *   技能库那一行会被那 78px 裁掉。
+     */
+    /* 术式库：左边一栏列表 + 右边详情（和技能页同一套两栏） */
+    .sk-techlib { flex: 1 1 380px; min-width: 0; }
+    .sk-row2 {
+      display: flex; align-items: center; gap: 12px; padding: 11px 12px;
+      border: 1px solid #30363d; border-radius: 10px; background: #1c2129;
+      margin-bottom: 8px; cursor: pointer; transition: .12s;
+    }
+    .sk-row2:hover { border-color: #3d444d; transform: translateX(2px); }
+    .sk-row2.on { border-color: #58a6ff; }
+    /* 编译不出来的那一份：红边框（模板 `.row2.bad`）+ 右边写"⚠ 跑不起来" */
+    .sk-row2.bad { border-color: #5c2b2b; }
+    .sk-row2 .sk-nm2 { font-weight: 600; min-width: 150px; color: #e6edf3; }
+    .sk-row2 .sk-meta { color: #8b949e; font-size: 12.5px; display: flex; gap: 14px; flex-wrap: wrap; }
+    /* ⚠ 新建入口：**框的大小和术式框一样**（用户点名）——所以它也用 `.sk-row2`，
+     *   只多一条虚线边和居中。高度靠同一套 padding 撑出来，不另写尺寸。 */
+    .sk-row2.sk-new { border-style: dashed; justify-content: center; color: #8b949e; }
+    .sk-row2.sk-new:hover { color: #e6edf3; transform: none; }
+
+    .sk-pts { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 700; }
+    .sk-pts.ok { color: #3fb950; }
+    .sk-pts.warn { color: #d29922; }
+    .sk-pts.neg { color: #c678dd; }
+    .sk-pts.bad { color: #f85149; }
+    .sk-pts.dim { color: #6e7681; font-weight: 400; }
+
+    /* 术式编辑：左边窄技能库（模板 `.lib` 214px）*/
+    .sk-editcols { display: flex; gap: 14px; align-items: flex-start; min-width: 0; }
+    .sk-libcol {
+      flex: 0 0 214px; width: 214px; max-width: 214px;
+      background: #1c2129; border: 1px solid #30363d; border-radius: 10px;
+      display: flex; flex-direction: column; min-height: 0; overflow: hidden;
+    }
+    .sk-libcol .sk-libhead {
+      padding: 10px 12px; border-bottom: 1px solid #30363d;
+      color: #8b949e; font-size: 12px; font-weight: 700;
+    }
+    .sk-libcol .sk-libscroll { max-height: 58vh; overflow-y: auto; padding: 10px; }
+    /* 库里的一个零件：**点一下就加进当前序列**（用户定的：先用按钮，不拖拽） */
+    .sk-chip2 {
+      display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+      border: 1px solid #30363d; border-radius: 8px; background: #0d1117;
+      margin-bottom: 6px; cursor: pointer; font: inherit; font-size: 12.5px;
+      color: #c9d1d9; text-align: left; width: 100%;
+    }
+    .sk-chip2:hover { border-color: #3d444d; }
+    .sk-chip2 .sq {
+      width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center;
+      font-size: 10.5px; font-weight: 700; color: #0d1117; flex: none;
+    }
+    .sk-chip2 .k { color: #6e7681; font-size: 11px; margin-left: auto; }
+
+    /* 序列：模板 `.seq` / `.seqhead` */
+    .sk-seq { background: #1c2129; border: 1px solid #30363d; border-radius: 12px; padding: 12px; }
+    .sk-seqhead { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .sk-seq-idx {
+      width: 24px; height: 24px; border-radius: 7px; background: #0d1117;
+      border: 1px solid #30363d; display: grid; place-items: center; font-size: 12px; color: #8b949e;
+    }
+    .sk-seqhead .sk-aim { color: #6e7681; font-size: 12px; }
+    /* 一格零件（技能 / 修饰副本）：模板 `.slot` 的 58×58 */
+    .sk-slot {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      width: 58px; height: 58px; border-radius: 10px; border: 1.5px solid #30363d;
+      background: #0d1117; color: #c9d1d9; font: inherit; cursor: pointer; position: relative;
+      padding: 2px;
+    }
+    .sk-slot:hover { border-color: #58a6ff; }
+    .sk-slot .ic {
+      width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
+      font-weight: 700; color: #0d1117; font-size: 13px;
+    }
+    .sk-slot .sk-slot-nm {
+      font-size: 9.5px; color: #8b949e; max-width: 54px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    /* 修饰副本的格子：虚线边（模板 `.slot` 的虚线底子 = "它还没有填条件"）*/
+    .sk-slot.sk-mod { border-style: dashed; border-color: #e3b341; }
+    .sk-slot.sk-bad { border-color: #f85149; border-style: solid; }
+    /* 每个零件**自己花多少**：贴在格子上（用户点名：每个零件各显示它自己花多少）*/
+    .sk-slot .sk-slot-pt {
+      position: absolute; top: -8px; right: -6px; font-size: 9.5px; font-weight: 700;
+      background: #0d1117; border: 1px solid #30363d; border-radius: 99px; padding: 0 5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .sk-slot .sk-slot-pt.cost { color: #3fb950; }
+    .sk-slot .sk-slot-pt.gain { color: #f85149; }
+    /* 加一格（模板 `.slot.add` 的 dotted） */
+    .sk-slot.sk-add { border-style: dotted; color: #6e7681; font-size: 20px; }
+    .sk-slots { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .sk-parts { display: flex; flex-direction: column; gap: 10px; }
+    .sk-partrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .sk-partrow .sk-arrow { color: #6e7681; font-size: 12px; }
+    /* 序列里那几颗按钮（加一段 / 删掉 / 上移下移）—— 先用按钮，不拖拽（用户定的） */
+    .sk-ops { display: flex; gap: 4px; margin-left: auto; }
+    .sk-ops button {
+      background: #21262d; border: 1px solid #30363d; border-radius: 8px;
+      color: #c9d1d9; font: inherit; font-size: 12px; padding: 3px 8px; cursor: pointer;
+    }
+    .sk-ops button:hover { border-color: #3d444d; background: #262d36; }
+    .sk-ops button[disabled] { opacity: .35; cursor: not-allowed; }
+    /* 放不出来那五因（界面上一句一句写清楚）*/
+    .sk-why { display: flex; flex-direction: column; gap: 3px; color: #8b949e; font-size: 12px; }
+    .sk-why b { color: #c9d1d9; }
+
+    .sk-empty { color: #6e7681; font-size: 12px; margin: 2px 0 12px; }
+
+    /*
+     * ⚠⚠ 2026-10-07（用户实测第 1 条）：宽度**照模板写死 346px**，不许弹性。
+     *   模板（第一权威 `ui-mockups/editor-v2.html` L39）写的就是
+     *   `.right{width:346px;flex:none;display:flex;flex-direction:column;...}`。
+     *
+     *   为什么非写死不可：弹性的宽度让面板的**宽 / 高 / 左边缘**跟着
+     *   "当前选中那一份技能的内容长短"走 —— 用户看到的就是
+     *   「选中每个技能的时候，描述页的形状和大小甚至位置都不同」。
+     *   `flex:none` + 三个 width 一起钉住 ⇒ 面板的几何**只由容器决定，与内容无关**。
+     *
+     *   ⚠ 高度钉的是**一个确定值**（`height:100%` = 左边技能库那一栏 `.sk-lib` 的
+     *     **同一个表达式** —— 两个高度表达式逐字相同，底边才是**算出来齐**的，
+     *     而不是"看着齐"）。这个 100% 由 `.sk-cols` / `.sk-page` / `#editorBody`
+     *     一路传下来（见 `.sk-page` 那一段），链上全是布局确定量。
+     *
+     *     ⚠⚠ 2026-10-06 用户实测第 3 条「改成满高，技能详情也是」：上一版这里是
+     *     `62vh`。62vh 是**视口**的比例，而这一栏真正能用的是"编辑器高 − 顶栏 −
+     *     上下 padding" ⇒ 它既没吃满、又没和左栏对齐（左栏那 62vh 里还要塞一个搜索框）。
+     *     改成 `height:100%` 之后，"满高"是**父容器给出来的**，不是估的。
+     *
+     *     + `overflow-y:auto` ⇒ 内容再长也只在面板**内部**滚：
+     *     面板自己不长大，更不会把左边的技能库 / 编辑区顶来顶去。
+     *
+     *   ⚠ 这一条**除了几何那几行，其余一字不动**（`--panel2` 底 / 1px 边 / 12px 圆角 /
+     *     16px 留白 / `gap:12px` 都是上一片定的、用户看过的那套）——
+     *     这次只换尺寸，免得"修宽度"顺手改掉别人已认可的东西。
+     */
+    .sk-detail {
+      flex: none; width: 346px; min-width: 346px; max-width: 346px;
+      height: 100%;
+      display: flex; flex-direction: column; gap: 12px; padding: 16px;
+      background: #1c2129; border: 1px solid #30363d; border-radius: 12px;
+      overflow-y: auto; overflow-x: hidden;
+    }
+    .sk-none { margin: auto; text-align: center; color: #6e7681; padding: 20px; }
+    .sk-none-big { font-size: 15px; color: #8b949e; margin-bottom: 6px; }
+    .sk-dname { font-size: 17px; font-weight: 700; color: #e6edf3; display: flex;
+      align-items: center; gap: 9px; flex-wrap: wrap; }
+    .sk-pill {
+      font-size: 11px; padding: 2px 8px; border-radius: 99px;
+      border: 1px solid #3d444d; color: #8b949e; font-weight: 400;
+    }
+    .sk-dnote { color: #8b949e; font-size: 13px; }
+    .sk-notes { color: #d29922; font-size: 12px; }
+    .sk-sect { font-size: 11.5px; color: #6e7681; letter-spacing: .06em; font-weight: 700; }
+    .sk-num { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .sk-num td { padding: 5px 0; border-bottom: 1px solid #232a33; }
+    .sk-num td:first-child { color: #8b949e; }
+    .sk-num td:last-child { text-align: right; color: #e6edf3; font-variant-numeric: tabular-nums; }
+    .sk-dact { margin-top: auto; padding-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    /* 主按钮 = 模板 `button.primary` 那一套（绿底 / 8px 圆角 / 9px 12px 留白） */
+    .sk-primary {
+      background: #238636; border: 1px solid #2ea043; color: #fff;
+      border-radius: 8px; padding: 9px 12px; cursor: pointer; font: inherit; font-weight: 600;
+    }
+    .sk-primary:hover { background: #2ea043; }
+    .sk-primary[disabled] { opacity: .4; cursor: not-allowed; }
+    .sk-warn {
+      border: 1px solid #f85149; background: #f8514914; color: #ff9a92;
+      border-radius: 9px; padding: 9px 11px; font-size: 12.5px; margin-bottom: 10px;
+    }
+
+    /* 编辑区那一屏：模板 `#editSkill` 是 `.main` 一列（顶栏 / `.grow` 滚动区 / `.foot`）。
+     * ⚠ 卡片直接挂在这一层上（每张卡是 `mountBlock` 的一块），所以 `gap:14px` 写在这里 ——
+     *   它顶的就是模板 `.grow` 的 `gap:14px`（卡片之间那一道缝）。 */
+    .sk-editscreen { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+    .sk-edithead {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      padding-bottom: 12px; margin-bottom: 2px; border-bottom: 1px solid #30363d;
+    }
+    .sk-edithead .sk-t { font-weight: 700; color: #e6edf3; }
+    .sk-edithead .sk-sub { color: #8b949e; font-size: 13px; }
+    .sk-spacer { flex: 1; }
+    .sk-formwhy, .sk-perm { color: #6e7681; font-size: 11.5px; margin-bottom: 12px; }
+    .sk-foot {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      position: sticky; bottom: -30px; margin-top: 14px; padding: 10px 14px;
+      border-top: 1px solid #30363d; background: #1c2129f2;
+    }
+    .sk-foot button {
+      background: #21262d; border: 1px solid #30363d; border-radius: 8px;
+      color: #c9d1d9; font: inherit; font-size: 12.5px; padding: 8px 12px; cursor: pointer;
+    }
+    .sk-foot button:hover { border-color: #3d444d; background: #262d36; }
+    .sk-foot button[disabled] { opacity: .4; cursor: not-allowed; }
+    .sk-foot .sk-note { color: #6e7681; font-size: 12.5px; }
+
+    /* ---------------- 卡片：用户点名的"一整块一整块"（模板的 `.row`） ----------------
+     *
+     * ⚠ 三组控件（① 瞄准 / ② 效果发生在哪里 / ③ 宿主）各是一张这样的卡片：
+     *   **自己的标题 + 边框 + 留白**，而不是一堆挤在一起的滑块。
+     */
+    .sk-card {
+      border: 1px solid #30363d; border-radius: 10px; background: #1c2129; padding: 12px;
+    }
+    /*
+     * ⚠ 技能介绍那一块真的类名还是 `group intro`（照用户的设计稿），
+     *   但**观感走卡片**：这一条就是"它也是模板里的一整块"。
+     *   （为什么不直接换成 `sk-card`：那是上一片定的类名，`tests/web.ts` 按它切片。）
+     */
+    .group.intro {
+      border: 1px solid #30363d; border-radius: 10px; background: #1c2129; padding: 12px;
+      margin-bottom: 0;
+    }
+    /* 卡头：模板 `.mainhead` / `.grouphead` 那一套（粗标题 + 右边一串小字） */
+    .sk-card-h {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      font-size: 13px; font-weight: 700; color: #e6edf3; margin-bottom: 8px;
+    }
+    .sk-card-h .sk-card-n { color: #6e7681; font-weight: 400; font-size: 12px; margin-left: auto; }
+    /* 卡里的一行（模板 `.row` 里那一小格：标签一行 + 控件一行） */
+    .sk-field { margin-bottom: 10px; }
+    .sk-field:last-child { margin-bottom: 0; }
+    .sk-field .label { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .sk-field .label span:first-child { color: #8b949e; font-size: 13px; }
+    .sk-field .label span:last-child { color: #e6edf3; font-weight: 600; font-size: 13px; }
+
+    /* 三组控件的选择按钮（模板 `button.ghost.sm` 的小号那一档） */
+    .sk-choice { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+    .sk-chip {
+      background: #21262d; border: 1px solid #30363d; border-radius: 8px;
+      color: #c9d1d9; font: inherit; font-size: 12.5px; padding: 5px 10px; cursor: pointer;
+    }
+    .sk-chip:hover { border-color: #3d444d; background: #262d36; }
+    .sk-chip.on { border-color: #58a6ff; background: #0d1117; color: #e6edf3; }
+    .sk-chip[disabled] { opacity: .45; cursor: not-allowed; }
+    /* 每条动作一张小卡（比外面那张浅一点、窄一点，和模板的 `.seq` 一个意思） */
+    .sk-act { border: 1px solid #30363d; border-radius: 10px; background: #161b22; padding: 10px 12px; margin-bottom: 10px; }
+    .sk-act:last-child { margin-bottom: 0; }
+    .sk-act-h { color: #e6edf3; font-size: 12.5px; margin-bottom: 8px; }
+    .sk-fold summary { color: #8b949e; font-size: 12.5px; cursor: pointer; padding: 2px 0; }
+    .sk-fold summary:hover { color: #e6edf3; }
+    .sk-fold .hint { color: #6e7681; font-size: 11px; }
+
+    /* 死滑块：不给拖的那些，数值照样看得见 + 一行"为什么" */
+    .sk-dead .label span:last-child { color: #8b949e; font-weight: 400; }
+    .sk-dead-tag {
+      font-size: 10px; color: #d29922; border: 1px solid #d29922;
+      border-radius: 4px; padding: 0 4px; margin-left: 4px;
+    }
+
+    /* 四档时长（无 / 1× / 3× / 9× + 单独的蓄力）—— 一张虚线小卡，和别的卡片分得开 */
+    .sk-tierrow { border: 1px dashed #3d444d; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+    .sk-tiers { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+    .sk-tier {
+      display: flex; flex-direction: column; align-items: center; gap: 1px;
+      background: #0d1117; border: 1px solid #30363d; border-radius: 8px;
+      color: #c9d1d9; font: inherit; padding: 5px 10px; cursor: pointer; min-width: 64px;
+    }
+    .sk-tier:hover { border-color: #3d444d; }
+    .sk-tier.on { border-color: #58a6ff; background: #0d1117; color: #e6edf3; }
+    .sk-tier.off { opacity: .45; cursor: not-allowed; }
+    .sk-tier[disabled] { cursor: not-allowed; }
+    .sk-tier .sk-tier-l { font-weight: 600; }
+    .sk-tier .sk-tier-s, .sk-tier .sk-tier-p { font-size: 10.5px; color: #8b949e; }
+    .sk-default {
+      font-size: 9.5px; color: #3fb950; border: 1px solid #3fb950;
+      border-radius: 4px; padding: 0 3px; margin-left: 3px; font-weight: 400;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <!-- 编辑器：改动立刻作用到右边的场地，不需要刷新。
+       两个页签：技能（术式里的一段）和术式（绑按键的那一套）。
+       ⚠ 页签上**不写"零件 / 成品"** —— 玩家 2026-09-21 说这些词故弄玄虚，
+         直接写 技能 / 术式 就行。 -->
+  <div id="editor">
+    <header>
+      <b>编辑器</b>
+      <div class="tabs">
+        <button id="tabSkill" class="tab on" data-tab="skill">技能</button>
+        <button id="tabTech" class="tab" data-tab="tech">术式</button>
+      </div>
+    </header>
+    <div class="scroll" id="editorBody" data-scroll="editorBody"></div>
+    <div class="scroll" id="techBody" style="display:none" data-scroll="techBody"></div>
+  </div>
+
+  <div id="overlay">
+    <div id="top">
+      <div class="panel">
+        <h1>术式系统</h1>
+        <div class="dim">模拟跑在浏览器里，渲染只是读它</div>
+      </div>
+      <div class="panel" id="stats"><span class="dim">加载中…</span></div>
+    </div>
+    <div id="bottom">
+      <div class="panel" id="skills"></div>
+      <div class="panel dim">
+        <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> 移动 ·
+        <span class="key">左键</span> 普攻（手上武器的那套招式）·
+        <span class="key">F</span> 捡起脚边的武器 ·
+        <span class="key">1</span>~<span class="key">0</span> 放术式 ·
+        <span class="key">空格</span> 暂停 ·
+        <span class="key">Tab</span> 编辑器（技能 / 术式两个页签）·
+        <span class="key">R</span> 重开本关（血契留着）·
+        <span class="key">N</span> 新的一局（血契归零）·
+        <span class="key">M</span> 静音
+      </div>
+    </div>
+  </div>
+  <div id="toast"></div>
+
+  <!-- 路径里的 technique-system/ 前缀来自 tsconfig.web.json 的 rootDir（提到了上一级），
+       因为 src/schema.ts 会转出仓库根的 skill-schema.ts -->
+  <script type="module" src="./dist/technique-system/web/src/main.js"></script>
+</body>
+</html>

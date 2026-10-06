@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.charged-laser",
+  "name": "贯日",
+  "activation": "release",
+  "skills": [
+    "skill.charged-laser"
+  ],
+  "tags": [
+    "远程",
+    "蓄力",
+    "爆发"
+  ],
+  "kind": "magic"
+}

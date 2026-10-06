@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "build",
+    "rootDir": "../src/server",
+    "types": ["node"],
+    "strict": true,
+    "skipLibCheck": true,
+    /*
+     * ⚠ 这两个是**配套**的（TypeScript 5.7+）：
+     *   源码那边（根 tsconfig）用的是 Node 24 的类型擦除，相对导入**必须**写 `.ts`；
+     *   而这里要吐出 CommonJS 的 `.js`。`rewriteRelativeImportExtensions`
+     *   负责把编译产物里的 `./assets.ts` 改写成 `./assets.js` ——
+     *   少了它，`build/static.js` 会去 `require('./assets.ts')`，运行时直接炸。
+     */
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true
+  },
+  "include": ["../src/server/assets.ts", "../src/server/static.ts"]
+}

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.iron-shirt",
+  "name": "铁布衫",
+  "note": "运一段时间的功，之后短时间内硬吃控制：晕不住也冻不住。用来顶着对面的控制打完一整套。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "self"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：给自己挂状态**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "第一个用 immuneTags 的技能（霸体）。这个字段一直是零内容 —— 校验器会警告'禁用了能力但没打 hardCC 标签，霸体挡不住它'，而反过来'免疫某类标签'从来没有东西用过。",
+  "_comment_immune": "免疫按**标签**匹配，不按状态 id。所以它自动挡住以后新加的一切控制，不用回来改这个技能 —— 这是这一整套设计的要点。带 hardCC / softCC 标签的状态就是冻结、沉默、缴械那一类。",
+  "_comment_slow": "免疫了控制，但代价是跑不动。这条走 modifiers（改派生属性）而不是 disables：disables 的语义是'能力被禁用'，而'自己让自己变慢'用属性表达更准，也不会和免疫逻辑互相纠缠。",
+  "_comment_tough": "硬吃控制还不够 —— 免疫控制本身的定价很低（+0.90），光靠它撑不起 20 能量 + 8 秒冷却这笔开销，账会剩一大截。减伤 20% 才是这笔开销真正买到的东西。这也是配平器逼出来的设计：账不平衡的时候先问'这个技能到底该有多强'，而不是把代价往下调。",
+  "phases": [
+    {
+      "id": "gather",
+      "name": "前摇",
+      "duration": 0.3,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 20
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "hold",
+      "name": "后摇",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "gather",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.iron-shirt",
+              "name": "铁布衫",
+              "tags": [
+                "buff"
+              ],
+              "duration": 3,
+              "immuneTags": [
+                "hardCC",
+                "softCC"
+              ],
+              "modifiers": [
+                {
+                  "path": "char.speed",
+                  "op": "mul",
+                  "value": {
+                    "const": 0.5
+                  }
+                },
+                {
+                  "path": "char.damageTaken",
+                  "op": "mul",
+                  "value": {
+                    "const": 0.8
+                  }
+                }
+              ],
+              "removal": {
+                "expires": true
+              },
+              "vfx": "fx.iron-shirt"
+            }
+          }
+        }
+      ],
+      "note": "运完功短时间内硬吃控制"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "防御",
+    "反控制"
+  ],
+  "rules": []
+}

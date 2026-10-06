@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.armor-pierce",
+  "name": "破军突刺",
+  "note": "一枪捅穿一条线，命中的人会被挑飞出去。刺空了会顺势往前冲一段 —— 所以空枪不算全亏，但会把自己送进人堆里。",
+  "targeting": {
+    "mode": "directional",
+    "valid": [
+      "enemy"
+    ],
+    "range": 3
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：近战突刺，和裂地斩同一档**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "一个技能同时把四个零内容的机制用上：capsule 载体、位移（击退 + 击飞）、onMiss 时机、以及「打空了顺势前冲」这个反应。",
+  "_comment_two_rules": "⚠ 伤害和击退是**两条固有效果**，不是一条 —— 一个动作只能有一个载荷。\n顺序要紧：伤害先算（effect[0]），击退后算（effect[1]）。反过来的话，人先被推飞出去，伤害的线段判定就落空了。",
+  "_comment_whiff": "onMiss 是「这一下什么都没打到」时才跑的反应。突刺刺空之后顺势前冲一点，是这类重刺的常规手感补偿，也让 onMiss 这个时机第一次有内容。",
+  "phases": [
+    {
+      "id": "coil",
+      "name": "前摇",
+      "duration": 0.3,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 30
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "thrust",
+      "name": "命中",
+      "duration": 0.2,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "control"
+    },
+    {
+      "id": "recover",
+      "name": "后摇",
+      "duration": 0.5,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "thrust",
+      "note": "一枪捅穿一条线",
+      "then": [
+        {
+          "delivery": {
+            "kind": "capsule",
+            "length": 4,
+            "width": 0.6
+          },
+          "payload": {
+            "kind": "damage",
+            "amount": {
+              "const": 30
+            },
+            "damageType": "physical"
+          }
+        }
+      ]
+    },
+    {
+      "id": "e2",
+      "at": "thrust",
+      "note": "捅中的人被挑飞出去",
+      "then": [
+        {
+          "target": "hit",
+          "payload": {
+            "kind": "displacement",
+            "mode": "knockback",
+            "distance": {
+              "const": 2
+            },
+            "airborne": true
+          }
+        }
+      ]
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "近战",
+    "突进",
+    "控制"
+  ],
+  "rules": [
+    {
+      "id": "r3",
+      "note": "刺空了就顺势前冲",
+      "when": "onMiss",
+      "then": [
+        {
+          "payload": {
+            "kind": "displacement",
+            "mode": "dash",
+            "distance": {
+              "const": 2
+            }
+          }
+        }
+      ],
+      "order": 0
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "_comment": "故意写坏的：activation 是 auto（'全是常驻术式'的那一档），里面却放了瞬发技能「裂地斩」—— 常驻术式里出现非 passive 技能。要报 FORM_INCOMPATIBLE。",
+
+  "schemaVersion": 1,
+  "id": "tech.form-auto-instant",
+  "name": "故意写坏的常驻术式里放瞬发技能",
+  "kind": "magic",
+  "activation": "auto",
+  "targeting": { "mode": "directional", "valid": ["enemy"] },
+  "skills": ["skill.cleave"]
+}

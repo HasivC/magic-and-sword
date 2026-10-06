@@ -1,0 +1,62 @@
+{
+  "_comment": "故意写坏的技能。冒烟测试用它验证校验器确实抓得住问题。每一处错误都是精心放的，改这个文件前先看 tests/smoke.ts 的期望列表。注意这里没有 points —— 点数是算出来的，写在这也不会被读。",
+
+  "schemaVersion": 2,
+  "id": "skill.broken",
+  "name": "故意写坏的技能",
+
+  "phases": [
+    {
+      "id": "a",
+      "duration": 0.5,
+      "occupiesCaster": false,
+      "interruptible": true,
+      "cancellable": true
+    }
+  ],
+
+  "ruleSlots": 2,
+
+  "rules": [
+    {
+      "id": "r1",
+      "when": "phaseComplete",
+      "phaseId": "nope",
+      "then": [
+        {
+          "_comment": "故意写成天文数字：这样无论汇率怎么调，合计都是很大一个正数（扣 1000 能量 = 一大笔额度）—— ⚠ 2026-09-30（日志 57）：它原来写的是『不可能落进配平容差 ⇒ 测 NOT_BALANCED』，而**容差和 NOT_BALANCED 都已经删掉了**（合计 ≥ 0 就能用）。这一份内容现在照样有用：它测的是『点数算得出来、而且不报错误』那条路。",
+          "payload": {
+            "kind": "attribute",
+            "path": "char.energy.current",
+            "op": "add",
+            "value": { "const": -1000 }
+          }
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "r2",
+      "when": "onTick",
+      "then": [
+        {
+          "payload": {
+            "kind": "attribute",
+            "path": "char.energy.current",
+            "op": "add",
+            "value": {}
+          }
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "r3",
+      "when": "whenIDie",
+      "then": [
+        { "payload": { "kind": "damage", "amount": { "const": 5 } } }
+      ],
+      "order": 2
+    }
+  ]
+}

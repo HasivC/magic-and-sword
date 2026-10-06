@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "entity.slow-field",
+  "name": "迟滞场",
+
+  "_comment": "第一片**持久区域**。它不是「一个单位」，是「一块地方」。\n\n玩家 2026-09-21 点名要的「无下限术式：靠近的事物自动减速」就是它。\n在此之前做不出来，因为两块能力都缺：\n  · `EntityKind` 里声明了 `'area'`（留在地上的区域）而引擎一处都不读\n  · `onEnter` / `onLeave` 在 schema 和说明生成器里都有，但从来没被触发过\n\n现在：位置**钉在落点上**（`areapoint` 术式点的那一点），\n每 tick 拿「现在谁在半径内」和上一帧比一次，进出的人触发\n常驻术式里的 `onEnter` / `onLeave`。\n\n⚠ 它和**光环**的差别（两种都做出来了，别搞混）：\n  · 区域（这个）—— 长在**一个点上**，进出**那一刻**触发一次\n  · 光环 —— 挂在**人身上**，`onTick` **持续施加**（见 tech.slow-aura）\n只想要「一直减速」用光环；想要「进来才减速、出去就恢复」用区域。",
+
+  "_comment_health": "血量给 1：它就是一块地方，该不该被打掉是**设计问题**。\n现在设成 1 表示「一击就散」—— 想做成拆不掉的地形就把血调高，或者干脆不写。\n⚠ 它没有 AI（`tickAi` 只处理 `kind: 'actor'`），所以它不会动、也不会还手。",
+
+  "kind": "area",
+  "tags": ["area", "field", "construct"],
+  "faction": "caster",
+
+  "attributes": {
+    "char.hp.max": 1,
+    "char.energy.max": 0,
+    "char.speed": 0
+  },
+
+  "_comment_radius": "半径 5 米 —— 目标选择、进出判定、画面提示全都读它。",
+  "radius": 5,
+
+  "activeTechniques": ["tech.slow-field"]
+}

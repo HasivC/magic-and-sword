@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.stealth",
+  "name": "潜行",
+  "activation": "press",
+  "skills": [
+    "skill.stealth"
+  ],
+  "tags": [
+    "潜行",
+    "生存"
+  ],
+  "kind": "magic"
+}

@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.blood-pact",
+  "name": "血契",
+  "note": "常驻的记账器：残血、被挂上负面状态的那一刻攒血契。它自己不做任何事，但没有它，负值术式永远放不出来。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "self"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**术式 tech.blood-pact**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "form": "passive",
+  "_comment_form": "形态 = passive（常驻）：时间轴里只有一段占位相（idle），没有固有效果 —— 它靠 onLowHp / onStatusApplied 这类**反应**干活，装上就生效。两条判据在这里指的是同一件事：它只被 activation: 'auto' 的术式用到（tech.blood-pact），而那条术式就是 scene 里挂的常驻术式。",
+  "_comment": "**血契的来源。** 它不是一个技能，是一块「常驻的记账器」——\n挂成常驻术式（scenario 里的 activeTechniques）之后，它只管把玩家\n「进入危机」的那些时刻换算成血契。\n\n玩家 2026-09-21 把这个来源抽象成这样一句话：\n\n  > 让玩家「进入」危机的行为（无论是玩家主动还是被动），\n  > 例如血量降到极低时、获取了某个负面 buff、在商店拿属性上限抵押等\n\n所以底下三条规则各自对应一类危机。**「商店抵押」不在这里** —— 那要等\n商店做出来，它是一条 `attribute` 动作（扣 char.hp.max、加血契），\n不需要新机制。\n\n⚠ 引擎只提供「加一条属性」这个能力，**具体数额全在这个文件里**。\n   想调血契经济，改这个文件的数字就行，代码一行不用动。\n\n⚠ 它是**负值术式**的另一半：这个文件负责「攒」，负值术式负责「花」。\n   两边都动数的时候要一起看 —— 攒得太快，负值术式就从「这一局的爆发」\n   变成「想放就放」，那它的取舍就没了。",
+  "_comment_balance": "量级是玩家定的：**日常在 10 上下，攒一整局才够一次 ~100 的终极**。\n一关按 30 秒~1 分钟的战斗算，目标是拿到 10~15 点 ——\n五关一局刚好 70~90，**一整局不花**才够一次 100 的终极。\n\n  残血跨过一次       +3    一关大概触发 1~3 次\n  被挂上负面状态     +2    一关大概触发 3~6 次\n\n⚠ 两个数都落在 `web/src/leaves.ts` 的 `BLOOD_PACT_AMOUNTS` 那张点表上 ——\n   血契是一门货币，和「扣 3 点能量」那种加减法不是一个量纲，所以它单独一张表。\n\n⚠ 两条都**按次**，不按时间 —— 见规则里的说明。",
+  "phases": [
+    {
+      "id": "idle",
+      "name": "常驻",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "none"
+    }
+  ],
+  "rules": [
+    {
+      "id": "r1",
+      "note": "残血：血量第一次跌破三成的那一刻",
+      "when": "onLowHp",
+      "_comment": "onLowHp 的语义是「血量**跨过** 30% 的那一瞬间」，不是「低于 30% 就一直触发」。\n后者会让这个技能的收益变成「按时间收租」，而不是「挨了一次危机」。\n（这个语义是 last-stand 那一轮定的，这里直接复用。）",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "attribute",
+            "path": "char.bloodPact.current",
+            "op": "add",
+            "value": {
+              "const": 3
+            }
+          }
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "r2",
+      "note": "被挂上负面状态：身上多了一个带 debuff 或 curse 标签的状态",
+      "when": "onStatusApplied",
+      "_comment": "⚠ 只在状态**第一次挂上**时触发，刷新时长和叠层不触发。\n否则一个每秒重挂一次的 debuff 会变成血契刷子 —— 而「进入危机」\n该是一件有次数的事。（引擎侧：status.ts 只在新建时入队。）",
+      "if": [
+        {
+          "type": "anyOf",
+          "of": [
+            {
+              "type": "hasStatusTag",
+              "who": "self",
+              "value": "debuff"
+            },
+            {
+              "type": "hasStatusTag",
+              "who": "self",
+              "value": "curse"
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "attribute",
+            "path": "char.bloodPact.current",
+            "op": "add",
+            "value": {
+              "const": 2
+            }
+          }
+        }
+      ],
+      "order": 1
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "常驻",
+    "资源"
+  ]
+}

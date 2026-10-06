@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.hunt",
+  "name": "猎杀",
+  "activation": "press",
+  "skills": [
+    "skill.hunt"
+  ],
+  "tags": [
+    "远程",
+    "输出"
+  ],
+  "kind": "magic"
+}

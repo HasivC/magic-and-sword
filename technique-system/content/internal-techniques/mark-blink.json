@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.mark-blink",
+  "name": "标记 · 瞬影",
+  "_comment": "**二段技能的第一个例子**（玩家 2026-09-21 要的）：\n\n  按第一次 → 给最近的敌人打标记（**不进冷却**）\n  按第二次 → 闪到那个人的身后（**进入冷却**）\n\n⚠ 它靠的是**序列层**：`sequences` 里每一段**各带自己的技能**，\n所以\"这一段不进冷却、那一段进冷却\"天然可分（冷却的键是段自己的 `id`，\n见下面 `_comment_sequences`）。这正是玩家说的：\n  > 之前定下来的\"序列\"机制只作用于武器技能，但现在我觉得也应该作用于魔法技能了，\n  > 因为想实现二段技能只能用这种方法，让每条序列有不同的 CD。\n\n⚠ `sequenceLinks` 的门是「目标身上有标记」：\n  标记过期之后再按，**第二段的门不成立 → 跳过它、回到第一段**，\n  也就是\"回头去标记一个新目标\"。\n  没有这道门的话，玩家会在没有标记的时候凭空瞬移出去（而落点是未知的）。",
+  "_comment_sequences": "⚠ 2026-09-21（日志 46）序列**内联**了：以前这里是\n`[\"tech.mark-step\", \"tech.blink-step\"]` —— 两段**各自是一份术式**、各占一个文件\n（那两份也各自被 `npm run validate` 单独校验过一遍）；现在每一段**自己带 `skills`**，\n那两份文件删掉了。\n\n⚠ `id` 是**显式写下来的**，而且就是旧子术式的 id。理由只有一个：\n**冷却键就是它**（`cd.tech.mark-step` / `cd.tech.blink-step`）——\n\"第一段不进冷却、第二段进冷却\"这条玩家点名的行为就是靠它成立的，\n而那份冷却还写在**老存档**里。改键属于行为改变，不该混在结构迁移里。\n\n⚠ **这一段和它的瞄准现在分住两处**（2026-09-21 日志 47）：\n段只带 `skills`（+ `links?`），**瞄准在技能上**（`skill.mark` 的 `targeting`）——\n所以下面那两段里**没有** `targeting` 了（校验器会对着写回去的报错）。\n⚠ 尤其**第二段那个 `requireStatusTag: 'marked'` 不能丢** —— 它搬到了\n`content/skills/blink.json` 的 `targeting` 上，运行时会读它\n（编译产物 → `activate` → `resolveAim`）：丢了的话「瞬影」会闪到**最近的**\n敌人背后，而不是\"我标过的那个\"（`tests/blink.ts` 钉着这一条）。",
+  "activation": "press",
+  "_comment_targeting": "⚠ **这份术式自己没有瞄准了**（2026-09-21 日志 47：\"瞄准搬到技能层\"）。\n\n搬家前这里有两份：容器自己的（`auto` / 14 米）和**每一段各一份**。\n现在它们都在**技能**上：`skill.mark` 是 `auto` / 14 米、\n`skill.blink` 是 `auto` / 30 米 + `requireStatusTag: 'marked'`。\n\n⚠ 运行时读的是**编译产物**里那一份 —— 编译时从这一段的技能身上取\n（`compile.ts` 的 `targetingOfChain`），所以\"第一段选最近的、第二段选带标记的\"\n这条行为一个字都没变。",
+  "sequences": [
+    {
+      "id": "tech.mark-step",
+      "name": "标记·起手",
+      "skills": [
+        "skill.mark"
+      ]
+    },
+    {
+      "id": "tech.blink-step",
+      "name": "瞬影·第二段",
+      "skills": [
+        "skill.blink"
+      ]
+    }
+  ],
+  "sequenceLinks": [
+    {
+      "if": [
+        {
+          "type": "hasStatusTag",
+          "who": "target",
+          "value": "marked"
+        }
+      ],
+      "note": "有标记才瞬移"
+    }
+  ],
+  "sequenceTimeout": 3,
+  "_comment_timeout": "3 秒：打完标记之后有三秒时间决定要不要闪过去。\n比默认的 1 秒宽 —— 这两段之间玩家是要**看一眼**的（看标记打在谁身上）。",
+  "tags": [
+    "序列",
+    "位移",
+    "标记"
+  ],
+  "kind": "magic",
+  "_comment_kind": "⚠ **它是魔法术式**，尽管它写了 `sequences`（2026-09-21 修，日志 44）。\n\n系别看的是\"它里面有没有武器系技能\"（`skill.ws-slash` 那种，在 content/weapon-skills/ 里），\n**不是\"有没有写序列\"** —— 序列层早就不是武器专用的了，它正是这个二段技能的实现手段\n（玩家原话：「想实现二段技能只能用这种方法」）。\n\n这条规则在 `technique-system/src/school.ts` 的 `deriveTechniqueKind` 里，\n而且是**传递**的：容器 → 序列 → 序列的序列，一直走到没有序列为止。\n它算出来的这里必须是 magic —— 两段各自引用的 `skill.mark` / `skill.blink` 都在 content/skills/（魔法系）。"
+}

@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "_comment": "内容清单。浏览器客户端按它加载 —— 硬编码清单迟早和实际文件对不上。npm test 会检查两边是否一致。列表里写的都是**文件名**（不带 .json），不是 id。",
+  "skills": [
+    "aegis",
+    "armor-pierce",
+    "barrier",
+    "blink",
+    "mark",
+    "blood-offering",
+    "blood-pact",
+    "charge-dash",
+    "charged-laser",
+    "charm",
+    "cleave",
+    "curse-of-undead",
+    "flame-wall",
+    "frost-lock",
+    "holy-light",
+    "hunt",
+    "hunter-instinct",
+    "impact-burst",
+    "infinity",
+    "insight",
+    "iron-shirt",
+    "last-stand-shield",
+    "lava-armor",
+    "magic-bolt",
+    "named-blade",
+    "place-slow-field",
+    "raise-dead",
+    "slow-field",
+    "soul-rend",
+    "stealth"
+  ],
+  "internalTechniques": [
+    "blood-pact",
+    "charged-laser",
+    "cleave",
+    "curse-of-undead",
+    "frost-lock",
+    "hunt",
+    "iron-sword-basic",
+    "last-stand",
+    "longsword-basic",
+    "magic-bolt",
+    "mark-blink",
+    "slow-field",
+    "soul-rend",
+    "stealth"
+  ],
+  "_comment_internalTechniques": "**内部术式库**：引擎/内容自己在用的术式，玩家看不到、也引用不到。\n\n玩家 2026-09-21 定的：\n  > 敌人用的术式存到别的地方，玩家在编辑器里看不到这些示范术式，也没法引用它们。\n\n以前出厂有 35 份术式，其中二十多份是「一个技能配一份同名术式」的示范 ——\n它们把术式编辑器塞成了一条技能栏。现在只留真的在用的：\n  · 场景里 AI / 玩家开局用的（cleave、magic-bolt、charged-laser …）\n  · 武器术式那两份容器（iron-sword-basic、longsword-basic）\n  · 二段技能的容器（mark-blink）\n其余 18 份删掉了（`npm test` 要用的那几份改成测试里现造，见 tests/probes.ts）。\n\n⚠ 2026-09-21（日志 46）**又少了 4 份**：`ws-slash` / `ws-thrust` / `mark-step` /\n`blink-step` —— 那四份**只为当序列而存在**，序列内联进容器之后它们没有别的用处了\n（17 → 13 份）。⚠ 但它们**仍然被老存档 / 老分享码按 id 引用**，\n所以引擎和校验器都还认\"按 id 引用的序列\"那种老形状（见 schema 的 `TechniqueSequences`）。",
+  "scenarios": [
+    "arena",
+    "duel"
+  ],
+  "fx": [
+    "slash",
+    "magic-bolt-hit"
+  ],
+  "_comment_scenarios": "浏览器玩**第一个**（arena 是给人玩的，duel 是给 npm run battle 跑的无头基准）。命令行可以指定任意一个。",
+  "statuses": [
+    "shield"
+  ],
+  "_comment_statuses": "状态库：可复用、可被多个技能按 id 引用的状态。定义在这儿，谁都能引用 —— 不像内联状态只能被它所在的技能定义。",
+  "entities": [
+    "barrier",
+    "skeleton",
+    "slow-field",
+    "totem"
+  ],
+  "_comment_entities": "实体预设：可召唤单位的模板。spawn 载荷按 id 引用它们。",
+  "weaponSkills": [
+    "slash",
+    "thrust"
+  ],
+  "weapons": [
+    "iron-sword",
+    "longsword"
+  ],
+  "_comment_weapons": "武器技能模板（**只读**，玩家不能改数值）和武器。武器是第五层内容，和技能/术式/状态/实体并列。",
+  "modifiers": [
+    "bounce",
+    "homing",
+    "layout",
+    "monitor-low-hp",
+    "multi-fire",
+    "split",
+    "trigger-on-cast",
+    "wait",
+    "wrap-persistent"
+  ],
+  "_comment_modifiers": "**修饰技能的原型**（2026-09-21，日志 48）—— 出厂零件，**只读**。\n\n⚠ 玩家定的两条：\n  > 修饰技能不能独立存在，只在术式里修饰别的技能；\n  > 原型住内容层，**玩家不能创建原型**。\n\n所以这个目录和 `content/skills` 有一处**根本的不同**：\n  · `content/skills` 的技能会被玩家**另存为变体**（自定义技能库，存在存档里）；\n  · 这里的原型**没有\"自定义原型库\"** —— 玩家拖进序列得到的是**副本**，\n    副本住在**术式**里（`SequenceSegment.mods`），不进任何库、别的术式引用不到。\n\n⚠ 原型逐片长出来的顺序：\n  · 日志 48：常驻包装 / 命悬监测 / 应声触发（三个）；\n  · 日志 51：多重释放 / 一分为 X（两个「份数」类动词）；\n  · 日志 52：等待 X 秒（一个「时间」类动词）；\n  · 日志 53：排布（一个「位置 / 方向」类零件 —— 一个零件、**编辑时选类型**）；\n  · 日志 56：追踪（一个「飞行路径」类零件 —— 让**被修饰的投射物**在半路上自己找最近的敌人；\n    ⚠ **非飞行载体（激光那类）装了它什么都不做**，而且**不是警告**，是\"这个修饰对这条序列不起作用\"）。\n  · 日志 58：弹射（一个「命中之后的去向」类零件 —— 投射物**命中一个敌人之后**弹给**最近的另一个**敌人，最多 N 次、每次衰减；⚠ **非飞行载体装了它什么都不做、而且不收费**，判据和追踪**共用同一个函数**（`school.ts` 的 `carrierFliesInWorld`）；⚠⚠ 它的**次数上限就是** `pipeline` 的深度限制 —— 玩家原话：\"各写一份迟早出现弹射绕过深度保护 ⇒ 自反馈\"）。\n  **不要为了演示新造零件。**",
+  "_comment_manifest": "列表里写的都是**文件名**（不带 .json），不是 id —— 和上面那几栏同一个规矩。"
+}

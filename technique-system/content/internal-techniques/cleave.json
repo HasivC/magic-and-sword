@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.cleave",
+  "name": "裂地斩",
+  "activation": "press",
+  "skills": [
+    "skill.cleave"
+  ],
+  "tags": [
+    "近战",
+    "输出"
+  ],
+  "kind": "magic"
+}

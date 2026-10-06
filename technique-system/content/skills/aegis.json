@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.aegis",
+  "name": "灵光盾",
+  "note": "给自己套一层会替你挨打的光盾。它先吸伤害，吸满了才碎。冲进人堆之前先垫上它，是最常见的用法。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "self"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：给自己挂护盾**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "第一个用 absorb 的技能（护盾）。absorb 池在引擎里、在定价里、在校验器里都做好了（纯吸收型钩子连 then 都可以不写），但没有任何技能用过它。",
+  "_comment_soulrend": "⚠ 这个状态**必须**叫 status.shield，而且现在它住在 **content/statuses/shield.json**（状态库）里，不再内联在这个技能里。\n\n裂魂（skill.soul-rend）的 r2 规则写的是「命中时驱散目标身上的 status.shield」，而这个名字以前只存在于 tests/pipeline.ts 里 —— 那条规则一旦真的遇到护盾就会抛「找不到状态定义」。现在定义在库里，两个技能都按 id 引用它，谁都不依赖「另一个技能恰好也在内容库里」。",
+  "_comment_why_library": "⚠ 为什么搬出去：内联状态只能被**它所在的那个技能**定义。\n裂魂要用同一个状态，就只能指望「灵光盾也在内容库里」—— 删掉灵光盾，裂魂就悬空了。\n（那种悬空现在会被 checkStatusRefs 在**加载期**抓住，但更好的做法是根本别产生它。）",
+  "phases": [
+    {
+      "id": "weave",
+      "name": "前摇",
+      "duration": 0.5,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 30
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "settle",
+      "name": "后摇",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 20
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "weave",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "statusId": "status.shield"
+          }
+        }
+      ],
+      "note": "给自己套一层能挡伤害的光盾"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "防御",
+    "护盾"
+  ],
+  "rules": []
+}

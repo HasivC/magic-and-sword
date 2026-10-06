@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.curse-of-undead",
+  "name": "亡灵诅咒",
+  "activation": "press",
+  "skills": [
+    "skill.curse-of-undead"
+  ],
+  "tags": [
+    "诅咒",
+    "控制"
+  ],
+  "kind": "magic"
+}

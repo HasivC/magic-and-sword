@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "entity.totem",
+  "name": "图腾",
+
+  "_comment": "第二个预设，专门用来演示「不是所有召唤物都是小兵」：\n它**不会动**（没有 ai），血厚，站在那儿当靶子/占位。\n\n⚠ 不写 ai 就是站着不动 —— 这是引擎里已有的行为（tickAi 会跳过没有 ai 的实体）。\n所以做图腾、木桩、传送门都不用改代码。",
+
+  "tags": ["construct", "summon", "static"],
+  "faction": "caster",
+
+  "attributes": {
+    "char.hp.max": 150,
+    "char.energy.max": 0,
+    "char.speed": 0
+  },
+
+  "_comment_radius": "radius 0.7 比小兵粗一圈 —— 它不只是画面大小：\n目标选择、击退落点、范围技能的命中判定全都读它。",
+  "radius": 0.7
+}

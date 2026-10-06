@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "weapon.iron-sword",
+  "name": "铁剑",
+  "_comment": "**开局拿的那把**。和长剑比：够不着、不快、伤害低。\n\n⚠ 它存在的意义是让「换武器」这个动作**看得见**：\n新手剑躺在地上没人会觉得它重要 —— 只有手上这把明显更差，\n捡起长剑的那一刻才有意义。\n\n⚠ 两个武器**共用**同一份横砍模板（skill.ws-slash），差别全在属性上：\n铁剑 reach 2.2 / damage 0.8，长剑 reach 3 / damage 1.1。\n这就是玩家要的「每种武器的技能范围和伤害因为属性不同而不同」。",
+  "attributes": {
+    "weapon.reach": 2.2,
+    "weapon.damage": 0.8,
+    "weapon.windup": 1.15
+  },
+  "_comment_windup": "windup 1.15 = 比长剑慢 15%。这是攻速那条轴的第一个真实用例：\n同一份横砍，铁剑挥起来更慢、够得更近、打得更轻。",
+  "weaponTechnique": "tech.iron-sword-basic",
+  "tags": [
+    "近战",
+    "剑",
+    "新手"
+  ]
+}

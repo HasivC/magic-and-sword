@@ -1,0 +1,42 @@
+{
+  "name": "technique-system",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "术式系统 · 阶段 0：加载器 + 校验器 + 模拟核心 + 伤害管线 + 阶段机 + 投射物 + AI",
+  "scripts": {
+    "validate": "node src/cli/validate.ts",
+    "run": "node src/cli/run.ts",
+    "battle": "node src/cli/battle.ts",
+    "calibrate": "node tools/calibrate.ts",
+    "overview": "node tools/overview.ts",
+    "grids": "node tools/grid-audit.ts",
+    "build:web": "node node_modules/typescript/bin/tsc -p tsconfig.web.json",
+    "serve": "node src/cli/serve.ts",
+    "play": "node tools/play.ts",
+    "desktop": "node desktop/launch.mjs",
+    "test": "node node_modules/typescript/bin/tsc -p tsconfig.web.json && node tests/smoke.ts && node tests/pricing.ts && node tests/describe.ts && node tests/fx.ts && node tests/weapons.ts && node tests/barrier.ts && node tests/blink.ts && node tests/sim.ts && node tests/pipeline.ts && node tests/cast.ts && node tests/battle.ts && node tests/scenario.ts && node tests/editor.ts && node tests/store.ts && node tests/school.ts && node tests/web.ts && node tests/purity.ts",
+    "test:smoke": "node tests/smoke.ts",
+    "test:pricing": "node tests/pricing.ts",
+    "test:describe": "node tests/describe.ts",
+    "test:fx": "node tests/fx.ts",
+    "test:weapons": "node tests/weapons.ts",
+    "test:barrier": "node tests/barrier.ts",
+    "test:blink": "node tests/blink.ts",
+    "test:sim": "node tests/sim.ts",
+    "test:pipeline": "node tests/pipeline.ts",
+    "test:cast": "node tests/cast.ts",
+    "test:battle": "node tests/battle.ts",
+    "test:scenario": "node tests/scenario.ts",
+    "test:editor": "node tests/editor.ts",
+    "test:store": "node tests/store.ts",
+    "test:school": "node tests/school.ts",
+    "test:web": "node tests/web.ts",
+    "test:purity": "node tests/purity.ts",
+    "typecheck": "node node_modules/typescript/bin/tsc --noEmit && node node_modules/typescript/bin/tsc -p tsconfig.web.json"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}

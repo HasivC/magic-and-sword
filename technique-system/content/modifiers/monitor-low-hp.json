@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "id": "mod.monitor.low-hp",
+  "name": "命悬监测",
+  "kind": "monitor",
+  "note": "一直盯着自己的血量。它跨过那条危险线的那一刻，放出它后面那个技能 —— 盾、回血、反击都行。",
+  "_comment": "**监测器**（玩家定的：监测器就是触发器的一种，条件是\"监测什么\"）。\n\n⚠ 条件的**事件来源**用的是**现成的事件清单**（`TriggerEvent`），不新造事件：\n这里的 `onLowHp` 就是 schema 里那一个（`pipeline.ts` 的 `fireLowHp` 已经在发它了）——\n所以\"血量跨过 30%\"这条语义**和旧「背水」逐字一样**，不是重新定义的。\n\n⚠ `crossing: true` 是**跨线**而不是\"低于\"：\n  写成\"低于就一直触发\"的话，一个残血的人每挨一下都会再放一次盾 ——\n  也就是\"每次挨打都白送一个\"。旧「背水」的 `_comment_semantics` 写死了这一条，\n  拆解时**原样保住**（tests/scenarios 第 21 节钉着它）。\n  ⚠ 边沿判据的一个已知代价：连续两次触发条件之间**没离开过**那条线，只算一次。\n    记在日志 48 的待裁定项里（\"要不要允许'每隔 N 秒也可以触发'\"）。\n\n⚠ 为什么 `when` 和 `condition` 是**两个**字段而不是把血量写进 when：\n  · `when` 回答\"**什么时候看**\"（每 tick 看 / 施法时看 / 跨低血线时看），它必须是现成事件；\n  · `condition` 回答\"**看到什么才算数**\"，用的是技能里那**同一套条件**\n    （`Condition`：hasStatusTag / hpBelow / stackAtLeast…）—— 定稿 §八 原话是\n    \"触发条件可编辑（条件那一套**和技能里的规则共用**）\"。\n  合成一个字段的话，条件那一套就没法复用了。",
+  "paramsTemplate": {
+    "when": {
+      "type": "event",
+      "default": "onLowHp",
+      "label": "什么时候看"
+    },
+    "condition": {
+      "type": "condition",
+      "default": {
+        "type": "hpBelow",
+        "who": "self",
+        "value": 0.3
+      },
+      "label": "满足什么条件"
+    },
+    "crossing": {
+      "type": "boolean",
+      "default": true,
+      "label": "跨过才算（不是一直都算）"
+    },
+    "origin": {
+      "type": "enum",
+      "values": [
+        "caster",
+        "aim",
+        "prevHitPoint",
+        "prevEndPoint"
+      ],
+      "default": "caster",
+      "label": "生成在哪里"
+    }
+  },
+  "params": {
+    "when": "onLowHp",
+    "condition": {
+      "type": "hpBelow",
+      "who": "self",
+      "value": 0.3
+    },
+    "crossing": true,
+    "origin": "caster"
+  },
+  "tags": [
+    "修饰",
+    "监测",
+    "保命"
+  ]
+}

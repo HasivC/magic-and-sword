@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.blink",
+  "name": "瞬影",
+  "note": "瞬间出现在**带标记的那个敌人身后**。它是瞬移，中途的子弹和地形都不经过；但如果没人带标记，这一下就什么都不做 —— 所以它总是跟在「标记」后面。",
+  "targeting": {
+    "mode": "auto",
+    "valid": [
+      "enemy"
+    ],
+    "range": 30,
+    "requireStatusTag": "marked"
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**段 tech.blink-step**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment_anchor": "⚠ 落点是 `anchor: 'target'` + `side: 'behind'`：\n以**目标的位置和朝向**算落点，闪到它背后。\n\n这是玩家 2026-09-21 要的（\"瞬移到标记敌人身后\"）。\n在那之前 `teleport` 只有\"沿我自己朝前闪 N 米\"这一种写法，表达不出\"那个人的身后\"。\n\n⚠ 没有目标时**什么都不发生**（不是退化成朝前闪）：\n标记过期之后再按，玩家要的是\"回头去标记一个新目标\"，\n而不是被随机传送出去。",
+  "phases": [
+    {
+      "id": "step",
+      "name": "命中",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "none"
+    },
+    {
+      "id": "settle",
+      "name": "后摇",
+      "duration": 0.2,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "control"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "step",
+      "then": [
+        {
+          "target": "hit",
+          "payload": {
+            "kind": "displacement",
+            "mode": "teleport",
+            "anchor": "target",
+            "side": "behind",
+            "distance": {
+              "const": 1.5
+            }
+          }
+        }
+      ],
+      "note": "闪到带标记的那个人背后"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "位移",
+    "突进"
+  ],
+  "rules": []
+}

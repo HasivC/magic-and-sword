@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.charge-dash",
+  "name": "突进",
+  "note": "朝面向方向冲出一段距离。位移本身没有伤害 —— 它的价值是编进术式当第一段，冲到了再接下一段。",
+  "targeting": {
+    "mode": "directional",
+    "valid": [
+      "enemy"
+    ],
+    "range": 6
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"）。\n\n⚠ 出厂内容里没有术式引用它；判据是**机制 + 测试钉着的行为**：\n纯位移本身不作用于谁，但它是「术式编程」那个例子的第一段 ——\n第二段「冲击波」是**无载体**动作，打的是**这次施法锁定的目标**，\n而锁定目标由**这一段**的瞄准解析出来（`directional` 会顺手挑正对着的那个人）。\n⚠ `self` 是**错的**：那样 `cast.targetId` 永远不设，第二段就只能打自己\n（`tests/scenario.ts` 第 31 节当场红 —— 它就是这么被抓出来的）。\n⚠ `range: 6` 和这个技能自己冲的**距离**一致（`displacement` 的 `distance: 6`）：\n\"冲得到的地方\"才谈得上\"撞到谁\"。不写 range 的话，`directional` 挑目标的射程是 0，\n贴脸的人都不算 —— 表现是第二段永远打自己。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n⚠ **意图 ≠ 瞄准方式**：客户端始终只交\"鼠标位置那一个点\"，技能各自解释它。",
+  "_comment": "纯位移技能：**它不作用于任何人**，只是把自己朝指向方向挪过去。\n\n正因为如此，它是「术式编程」那个例子的第一段：玩家要写的是\n「向指向方向位移，**若触碰到敌人**则释放冲击」——\n而纯位移技能永远不会\"命中\"谁，所以\"碰到了\"这件事必须由**接触检测**来记\n（见 src/sim/cast.ts 的 markContactHit）。",
+  "_comment_contact": "⚠ 这个游戏里实体之间本来**没有碰撞**（人会互相穿过去）。\n所以「触碰到敌人」是最小版本的接触判定：施法期间施法者和某个合法目标\n挨得足够近（半径和 + 0.15 米）就算碰到。\n\n它只在**有施法在进行**时算，所以站在敌人旁边不会凭空算数 ——\n得是某一段技能正在执行的那段时间里挨上的。",
+  "phases": [
+    {
+      "id": "wind",
+      "name": "前摇",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "energy": 10,
+        "cooldown": 8
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "slide",
+      "name": "后摇",
+      "duration": 0.5,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "control"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "wind",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "displacement",
+            "mode": "dash",
+            "distance": {
+              "const": 6
+            }
+          }
+        }
+      ],
+      "note": "朝指向方向冲出去"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "位移"
+  ],
+  "rules": []
+}

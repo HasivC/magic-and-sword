@@ -1,0 +1,23 @@
+# 依赖与构建产物：不要进版本库
+node_modules/
+**/node_modules/
+
+# 桌面壳的打包产物（那个 180MB 的 exe）
+desktop/out/
+**/desktop/out/
+
+# 客户端构建产物（由 npm run build:web 生成）
+**/web/dist/
+
+# 子代理的临时快照/探针（它们本来就不该留在项目里）
+.scratch/
+**/.scratch/
+
+# 临时文件
+*.tmp
+*.log
+
+# 操作系统
+Thumbs.db
+desktop.ini
+.DS_Store

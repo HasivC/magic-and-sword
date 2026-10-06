@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "fx.magic-bolt-hit",
+  "name": "魔法飞弹 · 命中火花",
+  "kind": "flipbook",
+  "dir": "magic-bolt-hit",
+  "prefix": "magic-bolt-hit_",
+  "pad": 5,
+  "start": 0,
+  "ext": "png",
+  "frames": 12,
+  "fps": 30,
+  "_fps": "你在 AE 里按多少 fps 做的就填多少。12 帧 @60fps = 0.2 秒（利落的命中火花）；如果 AE 合成是 24fps，那这 12 帧本来是 0.5 秒，想还原就改成 24",
+  "pxPerMeter": 128,
+  "_pxPerMeter": "256 像素画布 ÷ 2 米 ≈ 128。也就是说这张图里 1 米 = 128 像素",
+  "meters": 3.5,
+  "_meters": "它在游戏世界里占 3.5 米宽。想放大缩小**只改这个**，不用重做图。调的时候：node tools/preview-sprite.ts magic-bolt-hit --meters 4",
+  "anchor": [
+    0.5,
+    0.5
+  ],
+  "_anchor": "画面内容正好居中（检查器量出来是 127.5,127.5）—— 火花就炸在被打中的那个人身上",
+  "offset": [
+    0,
+    0
+  ],
+  "rotate": "none",
+  "_rotate": "命中火花不跟着朝向转 —— 它是从目标身上炸开的，和子弹从哪来无关",
+  "blend": "add"
+}

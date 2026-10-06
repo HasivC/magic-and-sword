@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.soul-rend",
+  "name": "裂魂",
+  "note": "蓄一段时间的力，然后打出一道贯体的高伤光束。它还会驱散目标身上的护盾、留下治不好的创伤，击杀之后冷却立刻刷新。",
+  "targeting": {
+    "mode": "directional",
+    "valid": [
+      "enemy",
+      "boss"
+    ],
+    "range": 8
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**术式 tech.soul-rend**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "phases": [
+    {
+      "id": "charge",
+      "name": "命中",
+      "duration": 1,
+      "occupiesCaster": true,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 20,
+        "energy": 40
+      },
+      "interrupt": "damage"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "charge",
+      "note": "一发打穿",
+      "then": [
+        {
+          "delivery": {
+            "kind": "beam",
+            "length": 8,
+            "width": 0.6
+          },
+          "payload": {
+            "kind": "damage",
+            "amount": {
+              "const": 200
+            },
+            "damageType": "shadow"
+          }
+        }
+      ]
+    }
+  ],
+  "ruleSlots": 4,
+  "_comment_debt_removed": "⚠ 这里原来写着 `factoryDebt: true`（出厂就负债）。2026-09-21 删掉了 —— 宗旨没有例外：出厂内容全是 0 点。这个技能现在就是一个重冷却、高能量的爆发技；想让它变成负值术式（一放就吃血契），自己编一份变体把它改强就行。⚠ 2026-09-21 顺手清掉了「超模」这个标签 —— 它是配平模型留下的（那时候裂魂的账面超过它该有的额度），现在它自己就是 0 点，标签只会误导。",
+  "tags": [
+    "爆发"
+  ],
+  "rules": [
+    {
+      "id": "r2",
+      "note": "命中时驱散目标身上的护盾",
+      "when": "onHit",
+      "_comment_was_broken": "⚠ 这条规则以前写的是 hasTag(target, 'shield') —— 查的是**实体自身**的标签，而护盾是**状态**的标签，实体身上没有 shield 这个标签，所以条件恒为假，规则从来没触发过。要用 hasStatusTag（查身上状态的标签）。它按标签匹配，所以以后新加的护盾类状态它也一并驱散，不用回来改。",
+      "if": [
+        {
+          "type": "hasStatusTag",
+          "who": "target",
+          "value": "shield"
+        }
+      ],
+      "then": [
+        {
+          "payload": {
+            "kind": "status",
+            "verb": "remove",
+            "statusId": "status.shield"
+          }
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "r3",
+      "note": "击杀就刷新",
+      "when": "onKill",
+      "then": [
+        {
+          "payload": {
+            "kind": "attribute",
+            "path": "skill.cooldown",
+            "op": "reset",
+            "value": {
+              "const": 0
+            }
+          }
+        }
+      ],
+      "order": 1
+    },
+    {
+      "id": "r4",
+      "note": "留下无法被驱散的创伤",
+      "when": "onHit",
+      "then": [
+        {
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.soul-rend",
+              "name": "裂魂",
+              "tags": [
+                "debuff",
+                "dot"
+              ],
+              "duration": 5,
+              "vfx": "fx.soul-rend",
+              "removal": {
+                "immuneTo": [
+                  "heal",
+                  "dispel"
+                ],
+                "onlyBy": [
+                  "tech.purge"
+                ],
+                "expires": true
+              },
+              "hooks": [
+                {
+                  "stage": "after",
+                  "when": "onTick",
+                  "every": 1,
+                  "then": [
+                    {
+                      "payload": {
+                        "kind": "damage",
+                        "amount": {
+                          "const": 10
+                        },
+                        "damageType": "shadow"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "order": 2
+    }
+  ]
+}

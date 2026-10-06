@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
+    // Node 24 跑 .ts 靠类型擦除，浏览器不行 —— 所以要单独编一份 JS。
+    // rewriteRelativeImportExtensions 会把 import 里的 .ts 改写成 .js，
+    // 源码里的 .ts 后缀一个都不用动。
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
+
+    "outDir": "web/dist",
+    // rootDir 提到上一级：src/schema.ts 会转出仓库根的 skill-schema.ts，
+    // 它在技术栈目录之外。产出因此会带一层 technique-system/ 前缀，
+    // index.html 里已经照顾到了。
+    "rootDir": "..",
+    "sourceMap": true,
+
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "skipLibCheck": true,
+
+    // 浏览器里没有 Node 的类型
+    "types": []
+  },
+  // validator 也能编进浏览器 —— 它只依赖 schema，不碰 node:
+  // 所以编辑器可以**实时**校验并算点数，和命令行用的是同一份代码
+  //
+  // scenario.ts 也编进来：装配层必须是**同一份**，否则"命令行里能跑的阵容
+  // 在浏览器里装配不出来"，而且两边报错方式还不一样（一边清晰、一边白屏）。
+  "include": ["src/scenario.ts", "src/sim/**/*.ts", "src/validator/**/*.ts", "web/src/**/*.ts"]
+}

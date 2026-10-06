@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.hunt",
+  "name": "猎杀",
+  "note": "射一支穿甲箭。对方身上有标记时额外疼 —— 和「洞察」配套用，先标记再猎杀。",
+  "targeting": {
+    "mode": "directional",
+    "valid": [
+      "enemy"
+    ],
+    "range": 14
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**术式 tech.hunt**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "「洞察」那个 marked 标签的消费者。带标记的目标挨得更痛 —— 这条规则用到的是 hasStatusTag 条件（上一轮为了修裂魂那条死了很久的驱散规则才接上线的）。",
+  "_comment_two_rules": "两条规则分开写（而不是一条带倍率的）是有意的：条件和数值放在一起，\n玩家在编辑器里看到的就是「若【身上有 marked 标签】则【额外 25 点】」，\n一眼能读懂。用倍率修饰的话，得先明白 pipeline.amount 是什么才看得懂。",
+  "phases": [
+    {
+      "id": "aim",
+      "name": "前摇",
+      "duration": 0.3,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 10
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "fire",
+      "name": "命中",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 3
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "fire",
+      "note": "一支穿甲箭",
+      "then": [
+        {
+          "delivery": {
+            "kind": "projectile",
+            "speed": 12,
+            "lifetime": 1.5,
+            "radius": 0.5,
+            "pierce": true
+          },
+          "payload": {
+            "kind": "damage",
+            "amount": {
+              "const": 25
+            },
+            "damageType": "physical"
+          }
+        }
+      ]
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "远程",
+    "输出"
+  ],
+  "rules": [
+    {
+      "id": "r2",
+      "note": "打带标记的目标额外疼",
+      "when": "onHit",
+      "if": [
+        {
+          "type": "hasStatusTag",
+          "who": "target",
+          "value": "marked"
+        }
+      ],
+      "then": [
+        {
+          "target": "hit",
+          "payload": {
+            "kind": "damage",
+            "amount": {
+              "const": 25
+            },
+            "damageType": "physical"
+          }
+        }
+      ],
+      "order": 0
+    }
+  ]
+}

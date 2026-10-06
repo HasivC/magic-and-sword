@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.soul-rend",
+  "name": "裂魂",
+  "activation": "press",
+  "skills": [
+    "skill.soul-rend"
+  ],
+  "tags": [
+    "爆发",
+    "超模"
+  ],
+  "kind": "magic"
+}

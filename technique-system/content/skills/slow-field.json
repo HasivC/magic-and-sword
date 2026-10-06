@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.slow-field",
+  "name": "迟滞场",
+  "note": "这是**场地自己的行为**：谁走进来就被黏住，走出去就松开。它挂在迟滞场上，谁放的不改变它做什么。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "enemy"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**术式 tech.slow-field**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "form": "passive",
+  "_comment_form": "形态 = passive（常驻）：只有一段占位相（idle）、没有固有效果 —— 靠 onEnter / onLeave 的反应干活（\"走进来\"不是一个时间轴事件）。它只被 activation: 'auto' 的术式用到（tech.slow-field，那是 entity.slow-field 的 activeTechniques 挂的常驻术式）—— 两条判据指的是同一件事。",
+  "_comment": "区域自己的行为：**进来就减速，出去就恢复**。\n\n它挂在 `entity.slow-field` 的 activeTechniques 上 —— 也就是说\n**这片场地的规则写在这里，而不是写在放下它的那个技能里**。\n这是有意的：一片场地的行为属于它自己，谁放的、怎么放的，都不该改变它做什么。",
+  "_comment_enter_leave": "⚠ 这两个时机以前从来没被触发过（引擎不读），\n所以这一对规则是**它们第一次真的跑起来**。\n\n`onEnter` / `onLeave` 的规则里，`ctx.target` 是**走进来的那个人** ——\n所以不带载体的动作直接作用在他身上。\n\n⚠ 「出去就恢复」必须显式写一条 `remove`。\n   引擎不会因为你离开了就自动撤销什么 —— 状态是挂在**人**身上的，\n   场地散不散和它没关系。忘了写这条的后果是：被减速过的人**永久减速**。",
+  "_comment_budget": "⚠ 这个术式自己必然是**负值**的（合计约 -3.5）。\n\n   不是数值没调好，是**结构**如此：场地的价值由**放下它的术式**承担\n   （tech.place-slow-field 付了能量和冷却），而两层账现在是分开算的 ——\n   每个技能都是自己那本账。所以场地这一半永远是「收益没地方付」。\n\n   现在它表现为一条**警告**（负值术式），不影响校验通过；\n   而且它 activation 是 auto、**没有任何人会去按它**，所以不影响玩法。\n   真要修，得让「术式 A 的花费由术式 B 承担」在定价里成立 ——\n   那是计价模型的一步，不是数值问题。记在日志的欠账里。",
+  "phases": [
+    {
+      "id": "idle",
+      "name": "常驻",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "none"
+    }
+  ],
+  "rules": [
+    {
+      "id": "r1",
+      "note": "走进来就被黏住",
+      "when": "onEnter",
+      "then": [
+        {
+          "_comment_target": "⚠ target: 'hit' 必须**显式**写出来 —— 引擎和定价器对它的理解不一样。\n\n   schema 说不写就是 'hit'，引擎也是这么做的（作用在走进来的那个人身上）。\n   但定价器有一条启发式：「没写 target 而且时机不是 onHit，那多半是给自己上的架势」。\n   于是同一个动作，引擎把减速挂给敌人，账上却按「自己给自己上 debuff」算成**代价**（正数）。\n\n   症状：这条规则在账上是 +3.6（提供额度），而它明明是收益。写完这一行两边一致。\n   根子在定价器那条启发式上（它已经咬过我四次），见日志的欠账。",
+          "target": "hit",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.slowField",
+              "name": "迟滞",
+              "tags": [
+                "debuff",
+                "slow"
+              ],
+              "duration": -1,
+              "_comment_duration": "写 -1（永久）是**故意的**：离开时的撤销由下面那条 onLeave 负责。\n写个 3 秒的话，站在场地里 3 秒之后减速自己就没了 —— 那就不成场地了。\n（定价上 -1 按「很长的时长」算，不是 0，所以它不占便宜。）",
+              "modifiers": [
+                {
+                  "path": "char.speed",
+                  "op": "mul",
+                  "value": {
+                    "const": 0.5
+                  }
+                }
+              ],
+              "vfx": "fx.slow"
+            }
+          }
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "r2",
+      "note": "走出去就松开",
+      "when": "onLeave",
+      "then": [
+        {
+          "_comment_target": "⚠ 这一条同样要写 target —— 不写的话，按定价器那条启发式，\n它会以为在移除自己的状态，而引擎移除的是走进来的那个人的。",
+          "target": "hit",
+          "payload": {
+            "kind": "status",
+            "verb": "remove",
+            "statusId": "status.slowField"
+          }
+        }
+      ],
+      "order": 1
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "区域",
+    "控制"
+  ]
+}

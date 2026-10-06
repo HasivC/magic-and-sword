@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.curse-of-undead",
+  "name": "亡灵诅咒",
+  "note": "给目标套上亡灵的特性：治疗在它身上反过来变成伤害。专门用来废掉会治疗的敌人 —— 包括你自己的治疗。",
+  "targeting": {
+    "mode": "locked",
+    "valid": [
+      "enemy"
+    ],
+    "range": 9
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**术式 tech.curse-of-undead**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "第一个用 hitKindIs 的技能（亡灵反转）。整个引擎里这个条件一直是零内容 —— 伤害管线里那句「亡灵受治疗反而受伤」写好了，但没有东西触发它。",
+  "_comment_mechanic": "机制的核心不是「治疗变伤害」这句话，而是**按标签匹配**：\n  条件 hitKindIs: heal  → 只有治疗进来时才翻转\n  动作 pipeline.reverse → 设成 1，管线把方向反过来\n所以它不需要为「治疗」单独写一条管线，也不需要知道治疗是哪来的。",
+  "_comment_why_enemy": "它挂在敌人身上，是**敌人对玩家的诅咒**，不是玩家的技能。\n理由：玩家自己带一个「治疗变伤害」的体质是纯负面，没人会想要；\n而敌人给你挂上它，就变成了一个真实的决策 —— 被诅咒的这 5 秒里，\n你的圣光术会打自己 30 点。这才是这个机制该有的样子。",
+  "phases": [
+    {
+      "id": "chant",
+      "name": "前摇",
+      "duration": 0.5,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 10
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "finish",
+      "name": "后摇",
+      "duration": 0.1,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "chant",
+      "then": [
+        {
+          "_comment_target": "⚠ target: 'hit' 必须**显式**写出来，不能省。\n\n   schema 说这个字段不写就是 'hit'（这次命中里「对面那个」），引擎也是这么做的。\n   但定价器不这么认：它有一条启发式 ——「没写 target 而且时机不是 onHit，那多半是给自己上的架势」\n   （src/pricing.ts 的 priceRule）。于是同一个动作，引擎打敌人、账上按自己算，\n   这个诅咒的点数方向直接反了（-4 变成 +4）。\n\n   显式写 'hit' 之后两边一致。根子在定价器那条启发式上，见日志的欠账。",
+          "target": "hit",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.curseOfUndead",
+              "name": "亡灵诅咒",
+              "tags": [
+                "debuff",
+                "curse"
+              ],
+              "duration": 5,
+              "_comment_hook": "side 不写就是 'target' —— 诅咒长在**被诅咒的人**身上，治疗打到他时才翻转。\n写错成 'source' 的话，会变成「施咒的人自己治疗会受伤」，完全是另一回事。",
+              "hooks": [
+                {
+                  "stage": "modify",
+                  "_comment_if": "⚠ 这个条件不能省。少了它，**所有**伤害经过时都会把 pipeline.reverse 设成 1，\n于是这个诅咒会变成「受到的伤害全部反转成治疗」—— 一个纯增益。\n第一次写就是这么写错的，靠测试里「治疗变成伤害」和「普通伤害不受影响」两条一起才看得出来。",
+                  "if": [
+                    {
+                      "type": "hitKindIs",
+                      "value": "heal"
+                    }
+                  ],
+                  "then": [
+                    {
+                      "target": "self",
+                      "payload": {
+                        "kind": "attribute",
+                        "path": "pipeline.reverse",
+                        "op": "set",
+                        "value": {
+                          "const": 1
+                        }
+                      }
+                    }
+                  ]
+                }
+              ],
+              "removal": {
+                "expires": true
+              },
+              "vfx": "fx.curse"
+            }
+          }
+        }
+      ],
+      "note": "让目标短时间内「活人变亡灵」：治疗反过来伤他"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "诅咒",
+    "控制"
+  ],
+  "rules": []
+}

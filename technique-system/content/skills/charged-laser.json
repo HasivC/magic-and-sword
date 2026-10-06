@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.charged-laser",
+  "name": "贯日",
+  "note": "按住键蓄力，蓄得越久打得越痛，然后放出一条长光束。蓄力期间无法转向 —— 它逼你提前选好要打谁。",
+  "targeting": {
+    "mode": "directional",
+    "valid": [
+      "enemy"
+    ],
+    "range": 12
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**术式 tech.charged-laser**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "form": "charged",
+  "_comment_form": "形态 = charged（蓄力）：charge 相是 `duration: -1` —— **时长由玩家控制**（按下 → 松开），所以这一段永远不会自己跑完，天然要求\"按下开始、松开结束\"。\n\n⚠ 判据是 `duration: -1` 这一条，不是\"名字里带蓄力\"：裂魂的 charge 相是固定 1 秒、突进的 wind 相是固定 0.1 秒 —— 那些是**固定的前摇**，跑完就结束，仍然是瞬发。",
+  "phases": [
+    {
+      "id": "charge",
+      "name": "蓄力",
+      "duration": -1,
+      "occupiesCaster": true,
+      "cancellable": true,
+      "locks": [
+        "turn"
+      ],
+      "cost": {
+        "energy": 30
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "fire",
+      "name": "命中",
+      "duration": 0.1,
+      "occupiesCaster": true,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 8
+      },
+      "interrupt": "control"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "fire",
+      "then": [
+        {
+          "delivery": {
+            "kind": "beam",
+            "length": 12,
+            "width": 0.8
+          },
+          "payload": {
+            "kind": "damage",
+            "amount": {
+              "ref": "charge",
+              "curve": [
+                [
+                  0,
+                  20
+                ],
+                [
+                  3,
+                  150
+                ]
+              ]
+            },
+            "damageType": "arcane"
+          }
+        }
+      ],
+      "note": "蓄得越久打得越痛"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "远程",
+    "蓄力",
+    "爆发"
+  ],
+  "rules": []
+}

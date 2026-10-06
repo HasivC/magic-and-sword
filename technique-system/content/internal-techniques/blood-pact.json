@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.blood-pact",
+  "name": "血契",
+  "note": "常驻的记账器：残血、被挂负面状态时攒血契，供负值术式花。",
+  "activation": "auto",
+  "skills": [
+    "skill.blood-pact"
+  ],
+  "tags": [
+    "常驻",
+    "资源"
+  ],
+  "kind": "magic"
+}

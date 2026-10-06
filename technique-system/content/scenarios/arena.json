@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "id": "scenario.arena",
+  "name": "演武场",
+  "_comment": "给人玩的场景（duel.json 是给机器跑的）。区别只有一个：这儿有一个 controlledBy: 'human' 的单位。\n\n⚠ 2026-09-21：出厂**不再有示范术式**。这个场景里写的 `techniques` 是「开局发什么」，\n那一份住在内部术式库里（敌人的骷髅术士也在用它）；浏览器开局会把它**复制一份进玩家的术式库**\n（`web/src/main.ts` 的 seedStarter），于是「我做的」里有一份能改的起点，其余九格空着等他自己拼。",
+  "_comment_seed": "seed 固定 = 同一场开局每次都一样。AI 的思考用的是 world 里的随机源，所以换 seed 会得到不同的敌人走位，但同一 seed 永远复现。",
+  "seed": 7,
+  "entities": [
+    {
+      "label": "你",
+      "faction": "player",
+      "pos": {
+        "x": 0,
+        "y": 0
+      },
+      "controlledBy": "human",
+      "attributes": {
+        "char.hp.max": 400,
+        "char.energy.max": 100,
+        "char.energy.regen": 14,
+        "char.speed": 6,
+        "char.critRate": 0.15,
+        "char.critDamage": 2
+      },
+      "_comment_bloodpact_stored": "⚠ 血契写在 stored 里，不是 attributes 里。\nattributes 是**派生属性的基础值**（上限、回复速率那种），而血契是**存储属性** ——\n和当前血量、当前能量同一类，可以真的加减。写错地方的表现是\n「攒血契的那条规则一跑到就抛异常」。",
+      "stored": {
+        "char.bloodPact.current": 0
+      },
+      "weapon": "weapon.iron-sword",
+      "_comment_weapon": "⚠ 开局拿的是**铁剑**（reach 2.2 / damage 0.8 / 慢 15%），\n而**长剑**躺在你旁边地上（看下面那个 kind: 'item' 的单位）。\n走过去按 F 换过来 —— 这是「换武器的前提是武器有建模」那条要求的可见结果：\n武器不是一个菜单，是一件站在地上、看得见、捡得起来的东西。\n\n⚠ 两个武器共用同一份横砍模板，差别全在属性上；\n而**招式**也不同：铁剑只有一段横砍，长剑是横砍 → 刺击（序列层）。",
+      "techniques": [
+        "tech.magic-bolt"
+      ],
+      "_comment_starter": "⚠ 玩家 2026-09-21 定的：**开局只有一格术式**，其余九格空着。\n\n理由（原话）：\n  > 目前数字键1到0仍然是释放技能而不是术式，改成这样：初始只有一个术式释放某个技能，\n  > 现有技能库不改，玩家可以自行创造术式。\n\n⚠ 这一格是**内部术式**，不是玩家的：`content/internal-techniques/magic-bolt.json` ——\n同一个术式敌人的骷髅术士也在用。玩家在编辑器里看不到它、也引用不到它（术式编辑器只列「我做的」）。\n所以浏览器开局会把它复制成玩家自己的那一份（名字变成「魔法飞弹（起手）」），技能栏指向副本。\n\n那二十多份「一个技能配一份同名术式」的出厂示范**删掉了** —— 它们把玩家的创作台\n塞成了一条技能栏（名字和技能一模一样，看起来根本不是术式）。\n技能本身**一个都没删**（基础技能库还是 30 个），所以想拼什么都拼得出来。",
+      "_comment_bloodoffering": "⚠ 出厂不带给玩家任何成品术式，所以也不带血祭斩那份示范。\n\n想要**负值术式**（花血契才能放的那种）的路子是：创造一个技能变体、把它改强 →\n那份术式的合计变成负数 → 每次释放消耗血契。技能 `skill.blood-offering` 还在基础技能库里。\n\n（2026-09-21 起出厂内容全是 0 点，宗旨没有例外 —— 负值术式只能自己编出来。）\n\n装术式的活是玩家的：按 Tab →「术式（成品）」→「新建」，把技能拼进去，再选装到哪一格。",
+      "_comment_passives": "⚠ 只有**血契记账器**（tech.blood-pact）挂在这儿。\n\n玩家 2026-09-21 定的：\n  > 血契记账器不是被动，它是一种**特殊机制**，不在被动栏显示。\n  > 前两个被动（名刀·司命 / 猎手直觉），它们应该只有在玩家创造术式、\n  > 术式中有它们并且术式被挂载时才激活。\n\n所以名刀·司命和猎手直觉**不再白送**：那两个术式本身也删了（内部术式库里没有它们）。\n技能 `skill.named-blade` / `skill.hunter-instinct` 还在基础技能库里 ——\n自己编一份术式把它们装进去、挂到某一格上，才生效。",
+      "activeTechniques": [
+        "tech.blood-pact"
+      ],
+      "_comment_bloodpact": "血契从 0 开始（玩家定的：**局内资源**，不自动回复）。\ntech.blood-pact 是常驻的记账器，管「攒」；\n负值术式管「花」。攒和花的数额都在内容里，引擎只提供能力。",
+      "_comment_perception": "潜行 + 洞察 + 猎杀是一组：潜行让敌人锁定不了你；洞察把藏起来的人揪出来并打标记；猎杀对带标记的目标额外 25 点。反制关系是内容层面的，不是硬编码的。\n\n⚠ 这三个**技能**都在基础技能库里，但出厂不再给你配好术式 —— 这正是「玩家可以自行创造术式」那一条：\n你想要这套反制，就得自己把 skill.stealth / skill.insight / skill.hunt 拼进一份术式、装到某一格上。",
+      "_comment_summon": "召唤（亡灵复生）同理：技能 skill.raise-dead 在基础技能库里，自己拼一份术式就能用。\n骷髅的 faction 是 'caster' —— 所以你召的帮你打，同一份预设被敌人用时帮敌人打。",
+      "_comment_areapoint": "点火地面（火墙）同理：skill.flame-wall 是 areapoint（点地面）—— 火墙长在你鼠标点的那块地上，不在你身上。\n超出 range（技能里写的那个）会被压回边缘，而不是拒绝释放。拼术式时 targeting.mode 选「点地面」。",
+      "_comment_compose": "术式编程那块能力也还在：第二段跑不跑由术式的 `links` 决定（比如 prevHit = 上一段碰到了人才炸）。\n出厂那份「冲撞冲击」示范删了，但形状一字不差地留在 `tests/probes.ts` 里 —— 那条路一直有测试钉着。"
+    },
+    {
+      "label": "长剑（地上）",
+      "faction": "neutral",
+      "kind": "item",
+      "pos": {
+        "x": 2.6,
+        "y": 1.8
+      },
+      "weapon": "weapon.longsword",
+      "_comment": "⚠ 这就是「武器作为实体」的全部内容：一个 kind: 'item' 的单位，\n身上带着一把 weapon.longsword。\n\n它不动、不打、不挨打、不进区域 —— 只有一件事：**可以被捡起来**。\n捡起来的时候你手上那把（铁剑）会掉在原地，所以换来换去是可逆的，\n地上会一直留着一把剑。\n\n⚠ label 写成「长剑（地上）」是因为 label 是战报和报错里唯一的指认方式，\n而它和玩家手上那把可能重名 —— 重名会让所有提示都分不清是谁。",
+      "radius": 0.25
+    },
+    {
+      "label": "剑奴",
+      "faction": "enemy",
+      "pos": {
+        "x": 6,
+        "y": 2
+      },
+      "_comment": "会潜行 + 猎杀的剑奴：它消失，你用得用「洞察」揪出来；它也会对**带标记的目标**打得更痛 —— 而标记是你自己打上去的。",
+      "attributes": {
+        "char.hp.max": 200,
+        "char.energy.max": 100,
+        "char.energy.regen": 10,
+        "char.speed": 5.5
+      },
+      "techniques": [
+        "tech.cleave",
+        "tech.stealth",
+        "tech.hunt"
+      ],
+      "ai": {
+        "targetFaction": "enemyOfSelf",
+        "preferredRange": 1.6,
+        "thinkInterval": 0.25
+      },
+      "tags": [
+        "assassin"
+      ]
+    },
+    {
+      "label": "骷髅术士",
+      "faction": "enemy",
+      "pos": {
+        "x": -8,
+        "y": -3
+      },
+      "_comment": "亡灵。它放两个东西：寒冰锁冻你，亡灵诅咒让你的治疗反过来伤你 —— 后者是 hitKindIs 这个条件唯一的用法。",
+      "attributes": {
+        "char.hp.max": 160,
+        "char.energy.max": 100,
+        "char.energy.regen": 8,
+        "char.speed": 3.6
+      },
+      "techniques": [
+        "tech.magic-bolt",
+        "tech.curse-of-undead",
+        "tech.frost-lock"
+      ],
+      "ai": {
+        "targetFaction": "enemyOfSelf",
+        "preferredRange": 8,
+        "thinkInterval": 0.4,
+        "chargeTime": 1.8
+      },
+      "tags": [
+        "undead"
+      ]
+    },
+    {
+      "label": "石像鬼",
+      "faction": "enemy",
+      "pos": {
+        "x": 3,
+        "y": -9
+      },
+      "_comment": "肉盾 + boss 标签。它带两样东西：贴脸横扫，和裂魂 —— 一发 200 伤害的贯体光束，蓄力 1 秒。那 1 秒是玩家的机会：蓄力阶段的打断等级是 damage，打中它就断了。裂魂的 targeting.valid 里有 boss，所以这个标签不是装饰。",
+      "tags": [
+        "boss",
+        "construct"
+      ],
+      "attributes": {
+        "char.hp.max": 900,
+        "char.energy.max": 60,
+        "char.energy.regen": 4,
+        "char.speed": 2.6
+      },
+      "radius": 0.9,
+      "techniques": [
+        "tech.cleave",
+        "tech.soul-rend"
+      ],
+      "ai": {
+        "targetFaction": "enemyOfSelf",
+        "preferredRange": 2,
+        "thinkInterval": 0.5,
+        "chargeTime": 1.2
+      }
+    }
+  ],
+  "_comment_keys": "技能栏 10 个键（1~9 然后 0）。开局只有键 1 装了术式，其余九格空着 —— 按 Tab 自己拼。\n\n⚠ 单位身上这个 `techniques` 列表现在是「**开局发什么**」，不是「出厂配装」：\n浏览器开局会把它复制成玩家自己的术式（见 _comment_starter），之后这一局跟的就是玩家排的技能栏。\n敌人身上那个列表仍然是出厂配装 —— 它们用内部术式库里的东西，玩家改不了。"
+}

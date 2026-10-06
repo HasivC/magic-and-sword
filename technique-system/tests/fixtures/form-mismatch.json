@@ -1,0 +1,11 @@
+{
+  "_comment": "故意写坏的：activation 是 press（按一下），但「贯日」的形态是 charged（蓄力）—— 蓄力那一段是 duration: -1，在'按一下'的术式里永远跑不完。要报 FORM_INCOMPATIBLE。",
+
+  "schemaVersion": 1,
+  "id": "tech.form-mismatch",
+  "name": "故意写坏的形态不相容",
+  "kind": "magic",
+  "activation": "press",
+  "targeting": { "mode": "directional", "valid": ["enemy"] },
+  "skills": ["skill.charged-laser"]
+}

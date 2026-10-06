@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "weapon.longsword",
+  "name": "长剑",
+  "note": "中规中矩的一把剑：够得着，不慢，伤害普通。",
+  "_comment": "**第一个武器**。一把武器只有两个术式槽（玩家 2026-09-21 定的）：\n  · weaponTechnique —— 武器术式，就是左键那套普攻\n  · magicTechnique  —— 魔法术式，一个普通术式（这里还没配）\n\n⚠ 武器技能的数值**不在技能里改**，而是由下面的 attributes 代入：\n横砍的扇形半径读 `weapon.reach`，伤害读 `weapon.damage`。\n同一份技能模板放到一把\"短匕\"（reach 1.5）上，招还是那一招，范围就短了。",
+  "_comment_char": "`char.speed` ×0.95 是\"给**持有者**的修饰\" —— 和 `weapon.*` 不是一回事：\n  `weapon.*` 是这把武器自己的参数，只被武器技能的 ref 读\n  `char.*`   是加到人身上的修饰，走的是和状态同一套修饰符系统",
+  "attributes": {
+    "weapon.reach": 3,
+    "weapon.damage": 1.1,
+    "weapon.windup": 1,
+    "char.speed": 0.95
+  },
+  "weaponTechnique": "tech.longsword-basic",
+  "tags": [
+    "近战",
+    "剑"
+  ]
+}

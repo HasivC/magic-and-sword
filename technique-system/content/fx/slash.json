@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "fx.slash",
+  "name": "刀光（示例占位）",
+  "_comment": "这是 tools/make-sample-fx.ts 生成的**占位素材**。把 content/fx/slash/ 里的 PNG 换成你在 AE 里做的，这个文件不用改。规格见 docs/fx-authoring.md",
+  "kind": "flipbook",
+  "dir": "slash",
+  "prefix": "slash_",
+  "pad": 4,
+  "ext": "png",
+  "frames": 24,
+  "fps": 60,
+  "pxPerMeter": 64,
+  "meters": 6,
+  "anchor": [
+    0.5,
+    0.5
+  ],
+  "offset": [
+    0,
+    0
+  ],
+  "_comment_rotate": "⚠ `rotate: \"facing\"` —— 素材必须**跟着这一下的方向转**。\n\n玩家 2026-09-21 报的 bug：\n  > 使用铁剑时鼠标左键的攻击始终朝向正右方而不是鼠标方向\n\n引擎那边一直是好的（打中了鼠标指着的人）。看着不对的是**特效**：\n这套占位素材里的刀光画在画布右半边（朝右的一道弧），而 `rotate` 写的是 `none` ——\n于是不管往哪挥，那一刀都画在角色右边。改成 `facing` 之后它会按事件的 `dir` 转。\n\n方向和偏移都按**施法者朝向**处理：偏移也一起转，不然往左挥时特效会跑到身后。\n\n⚠ 方向性载体（扇形 / 光束 / 突刺）的素材漏写这一条**不会报错**，只会看着不对 ——\n所以 `tests/smoke.ts` 里有一条跨文件检查盯着它（方向性载体 + 写了 vfx 的素材\n必须 `rotate: \"facing\"`）。",
+  "rotate": "facing",
+  "blend": "add"
+}

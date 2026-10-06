@@ -1,0 +1,7871 @@
+{
+  "_oral": {
+    "title": "点表草稿 —— 每个技能 × 每个可调变量 × 每个取值 → 一个整数点数",
+    "status": "草稿 · 待用户签字",
+    "isDraft": true
+  },
+  "_draft": {
+    "method": "把这一片叶子改成该取值、其余一个字不动，再对出厂那一份做相对账（skillLedger 的合计）—— 也就是现值枚举，不是另发明一套公式",
+    "methodCode": "rowPoints = skillLedger(perturbed, factory, opts).total",
+    "integerRule": "逐条取整 + 最大余数法；每个非零条目至少 1 点（住在 integerizeEntries 里，账上印的就是这个整数）",
+    "formulaFiles": [
+      "technique-system/src/pricing.ts:2548 skillLedger",
+      "technique-system/src/pricing.ts:2316 ledgerEntries",
+      "technique-system/src/pricing.ts:925 integerPointsOf（逐条取整 + 至少 1 点）",
+      "technique-system/src/pricing.ts:2724 modifierPointsOf（修饰零件的账）"
+    ],
+    "valueSource": "technique-system/web/src/leaves.ts:114 VALUE_SETS（编辑器的点表）+ leaves.ts:557 collectLeaves（哪些叶子可调）",
+    "caveats": [
+      "阶段时长这条轴今天已经走查表（balance.json 的 tierTables.phaseDurationPoints，四档 = 今天的值）—— 本表印的是那个结果；用户要的全量点表会把它一起替掉",
+      "本轮的取值集合只取编辑器点表里的取值；连续滑块 / 自由取值只列出来，不在表里",
+      "相对账的两条规矩（逐条取整、每个非零条目至少 1 点）会让\"小差别\"在账上被压平 —— 这是已有规格的后果，不是本表引入的",
+      "rawPoints 是没取整的那一头（原料值），points 是账上印的整数"
+    ],
+    "pending": [
+      "连续取值（修饰零件的转速 / 搜索距离 / 弹射次数 / 衰减 / 排布半径与角度 / 等待秒数）要不要定档位",
+      "武器技能（skill.ws-slash / skill.ws-thrust，readonly）要不要进表",
+      "账上恒 0 的那些变量（血契额度、召唤数量、感知可见度、pipeline 数值……）要不要定价",
+      "同一个技能里\"两条同类变量\"（例如两个 radius）要不要共用一列价"
+    ]
+  },
+  "_pending": {
+    "continuous": [
+      {
+        "where": "content/modifiers/homing.json",
+        "key": "turnRate",
+        "range": "1 ~ 30（度/tick，step 1）",
+        "note": "追踪的转速"
+      },
+      {
+        "where": "content/modifiers/homing.json",
+        "key": "maxRange",
+        "range": "1 ~ 16（米，step 1）",
+        "note": "追踪的搜索距离"
+      },
+      {
+        "where": "content/modifiers/bounce.json",
+        "key": "maxBounces",
+        "range": "1 ~ 4（次，step 1）",
+        "note": "弹射次数（上限跟着 MAX_ACTION_DEPTH）"
+      },
+      {
+        "where": "content/modifiers/bounce.json",
+        "key": "damageFalloff",
+        "range": "0.1 ~ 1（step 0.05）",
+        "note": "弹射衰减（连乘）"
+      },
+      {
+        "where": "content/modifiers/layout.json",
+        "key": "radius",
+        "range": "0.5 ~ 6（米，step 1）",
+        "note": "环绕半径"
+      },
+      {
+        "where": "content/modifiers/layout.json",
+        "key": "startAngle",
+        "range": "-180 ~ 180（度，step 1）",
+        "note": "环绕起始角"
+      },
+      {
+        "where": "content/modifiers/layout.json",
+        "key": "spread",
+        "range": "0 ~ 360（度，step 1）",
+        "note": "扇形张角"
+      },
+      {
+        "where": "content/modifiers/layout.json",
+        "key": "mirrorAngle",
+        "range": "-45 ~ 45（度，step 1）",
+        "note": "镜像偏移角"
+      },
+      {
+        "where": "content/modifiers/wait.json",
+        "key": "seconds",
+        "range": "0.2 ~ 3（秒，step 未写）",
+        "note": "等待秒数"
+      },
+      {
+        "where": "content/modifiers/*（副本参数）",
+        "key": "mods[].at",
+        "range": "整数序号（今天引擎只接线 at: 0）",
+        "note": "修饰目标序号"
+      },
+      {
+        "where": "content/weapons/*.json",
+        "key": "weapon.reach / weapon.damage / weapon.windup / char.speed",
+        "range": "武器属性表（连续/自由）",
+        "note": "武器属性代入"
+      }
+    ],
+    "unpricedVariables": [
+      {
+        "key": "width",
+        "path": "effect.0.then.0.delivery.width",
+        "label": "命中 · 伤害 · 宽度",
+        "factoryValue": 0.5,
+        "values": [
+          0.2,
+          0.4,
+          0.5,
+          0.6,
+          0.8,
+          1.2
+        ]
+      },
+      {
+        "key": "(兜底)",
+        "path": "effect.0.then.0.payload.count",
+        "label": "前摇 · 召唤 · 数量",
+        "factoryValue": 1,
+        "values": [
+          -4,
+          -3,
+          0,
+          1
+        ]
+      },
+      {
+        "key": "lifetime",
+        "path": "effect.0.then.0.payload.lifetime",
+        "label": "前摇 · 召唤 · 飞行时间",
+        "factoryValue": 3,
+        "values": [
+          0.5,
+          1,
+          1.5,
+          3,
+          8
+        ]
+      },
+      {
+        "key": "angle",
+        "path": "effect.0.then.0.delivery.angle",
+        "label": "命中 · 伤害 · 张角",
+        "factoryValue": 120,
+        "values": [
+          45,
+          90,
+          120,
+          180,
+          360
+        ]
+      },
+      {
+        "key": "(兜底)",
+        "path": "rules.0.then.0.payload.value.const",
+        "label": "血量过低时 · 改属性 · 血契",
+        "factoryValue": 3,
+        "values": [
+          1,
+          2,
+          3,
+          5,
+          8,
+          15,
+          30,
+          60,
+          100
+        ]
+      },
+      {
+        "key": "(兜底)",
+        "path": "rules.1.then.0.payload.value.const",
+        "label": "身上新挂上状态时 · 改属性 · 血契",
+        "factoryValue": 2,
+        "values": [
+          1,
+          2,
+          3,
+          5,
+          8,
+          15,
+          30,
+          60,
+          100
+        ]
+      },
+      {
+        "key": "speed",
+        "path": "effect.0.then.0.delivery.speed",
+        "label": "命中 · 伤害 · 速度",
+        "factoryValue": 12,
+        "values": [
+          4,
+          8,
+          12,
+          16,
+          24
+        ]
+      },
+      {
+        "key": "lifetime",
+        "path": "effect.0.then.0.delivery.lifetime",
+        "label": "命中 · 伤害 · 飞行时间",
+        "factoryValue": 1.5,
+        "values": [
+          0.5,
+          1,
+          1.5,
+          3,
+          8
+        ]
+      },
+      {
+        "key": "radius",
+        "path": "effect.0.then.0.delivery.radius",
+        "label": "命中 · 伤害 · 半径",
+        "factoryValue": 0.5,
+        "values": [
+          0.5,
+          1,
+          2.5,
+          4,
+          6
+        ]
+      },
+      {
+        "key": "every",
+        "path": "rules.0.every",
+        "label": "每 0.25 秒 · 间隔",
+        "factoryValue": 0.25,
+        "values": [
+          0.1,
+          0.25,
+          0.5,
+          1,
+          2
+        ]
+      },
+      {
+        "key": "duration",
+        "path": "rules.0.then.0.payload.inline.duration",
+        "label": "每 0.25 秒 · 挂状态 · 持续",
+        "factoryValue": 0.5,
+        "values": [
+          -1,
+          0.5,
+          1.5,
+          3,
+          5,
+          10,
+          25
+        ]
+      },
+      {
+        "key": "duration",
+        "path": "effect.1.then.0.payload.duration",
+        "label": "前摇 · 感知 · 持续",
+        "factoryValue": 10,
+        "values": [
+          -1,
+          0.5,
+          1.5,
+          3,
+          5,
+          10,
+          25
+        ]
+      },
+      {
+        "key": "duration",
+        "path": "rules.0.then.0.payload.inline.duration",
+        "label": "后摇 · 挂状态 · 持续",
+        "factoryValue": 5,
+        "values": [
+          -1,
+          0.5,
+          1.5,
+          3,
+          5,
+          10,
+          25
+        ]
+      },
+      {
+        "key": "duration",
+        "path": "effect.0.then.0.payload.inline.duration",
+        "label": "命中 · 挂状态 · 持续",
+        "factoryValue": 10,
+        "values": [
+          -1,
+          0.5,
+          1.5,
+          3,
+          5,
+          10,
+          25
+        ]
+      },
+      {
+        "key": "duration",
+        "path": "effect.0.then.0.payload.duration",
+        "label": "前摇 · 感知 · 持续",
+        "factoryValue": 5,
+        "values": [
+          -1,
+          0.5,
+          1.5,
+          3,
+          5,
+          10,
+          25
+        ]
+      },
+      {
+        "key": "(兜底)",
+        "path": "rules.0.then.0.payload.value.const",
+        "label": "受到致命伤时 · 改属性 · 这一下的数值",
+        "factoryValue": 1,
+        "values": [
+          -4,
+          -3,
+          0,
+          1
+        ]
+      },
+      {
+        "key": "duration",
+        "path": "rules.0.then.1.payload.inline.duration",
+        "label": "受到致命伤时 · 挂状态 · 持续",
+        "factoryValue": 1.5,
+        "values": [
+          -1,
+          0.5,
+          1.5,
+          3,
+          5,
+          10,
+          25
+        ]
+      },
+      {
+        "key": "(兜底)",
+        "path": "rules.0.then.1.payload.inline.hooks.0.then.0.payload.value.const",
+        "label": "受到致命伤时 · 挂状态 · 拦截阶段 · 改属性 · 这一下的数值",
+        "factoryValue": 1,
+        "values": [
+          -4,
+          -3,
+          0,
+          1
+        ]
+      },
+      {
+        "key": "duration",
+        "path": "rules.0.then.2.payload.inline.duration",
+        "label": "受到致命伤时 · 挂状态 · 持续",
+        "factoryValue": 25,
+        "values": [
+          -1,
+          0.5,
+          1.5,
+          3,
+          5,
+          10,
+          25
+        ]
+      },
+      {
+        "key": "(兜底)",
+        "path": "rules.1.then.0.payload.value.const",
+        "label": "击杀时 · 改属性 · 冷却",
+        "factoryValue": 0,
+        "values": [
+          -4,
+          -3,
+          0,
+          1
+        ]
+      },
+      {
+        "key": "duration",
+        "path": "rules.2.then.0.payload.inline.duration",
+        "label": "命中时 · 挂状态 · 持续",
+        "factoryValue": 5,
+        "values": [
+          -1,
+          0.5,
+          1.5,
+          3,
+          5,
+          10,
+          25
+        ]
+      }
+    ]
+  },
+  "_summary": {
+    "skills": 32,
+    "skillsEditable": 30,
+    "skillsReadonly": 2,
+    "rows": 1322,
+    "rowsZero": 399,
+    "rowsNonZero": 923,
+    "techniques": 14,
+    "factoryAnchorBadSkills": 0,
+    "factoryAnchorBadTechniques": 0,
+    "coverageMisses": 0
+  },
+  "skills": {
+    "skill.aegis": {
+      "_name": "灵光盾",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 5,
+      "_rows": 29,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 30,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 20,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -4,
+            "3": -3,
+            "8": -2,
+            "20": 0
+          },
+          "raw": {
+            "2": -4,
+            "3": -3,
+            "8": -2,
+            "20": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.armor-pierce": {
+      "_name": "破军突刺",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 11,
+      "_rows": 62,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 30,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "duration@phases.2.duration": {
+          "key": "duration",
+          "path": "phases.2.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "cooldown@phases.2.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.2.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "length@effect.0.then.0.delivery.length": {
+          "key": "length",
+          "path": "effect.0.then.0.delivery.length",
+          "label": "命中 · 伤害 · 长度",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 4,
+          "values": [
+            2,
+            4,
+            8,
+            12,
+            16
+          ],
+          "points": {
+            "2": 1,
+            "4": 0,
+            "8": -1,
+            "12": -2,
+            "16": -3
+          },
+          "raw": {
+            "2": 1,
+            "4": 0,
+            "8": -1,
+            "12": -2,
+            "16": -3
+          }
+        },
+        "width@effect.0.then.0.delivery.width": {
+          "key": "width",
+          "path": "effect.0.then.0.delivery.width",
+          "label": "命中 · 伤害 · 宽度",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 0.6,
+          "values": [
+            0.2,
+            0.4,
+            0.6,
+            0.8,
+            1.2
+          ],
+          "points": {
+            "0.2": 0,
+            "0.4": 0,
+            "0.6": 0,
+            "0.8": 0,
+            "1.2": 0
+          },
+          "raw": {
+            "0.2": 0,
+            "0.4": 0,
+            "0.6": 0,
+            "0.8": 0,
+            "1.2": 0
+          }
+        },
+        "amount@effect.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "effect.0.then.0.payload.amount.const",
+          "label": "命中 · 伤害",
+          "group": "固有效果",
+          "unit": "点",
+          "factoryValue": 30,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 1,
+            "25": 1,
+            "30": 0,
+            "50": -1,
+            "200": -6
+          },
+          "raw": {
+            "10": 1,
+            "25": 1,
+            "30": 0,
+            "50": -1,
+            "200": -6
+          }
+        },
+        "distance@effect.1.then.0.payload.distance.const": {
+          "key": "distance",
+          "path": "effect.1.then.0.payload.distance.const",
+          "label": "命中 · 击退 · 距离",
+          "group": "固有效果",
+          "unit": "",
+          "factoryValue": 2,
+          "values": [
+            1,
+            1.5,
+            2,
+            2.5,
+            4,
+            6
+          ],
+          "points": {
+            "1": 1,
+            "2": 0,
+            "4": -1,
+            "6": -2,
+            "1.5": 1,
+            "2.5": -1
+          },
+          "raw": {
+            "1": 1,
+            "2": 0,
+            "4": -1,
+            "6": -2,
+            "1.5": 1,
+            "2.5": -1
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        },
+        "distance@rules.0.then.0.payload.distance.const": {
+          "key": "distance",
+          "path": "rules.0.then.0.payload.distance.const",
+          "label": "未命中时 · 位移 · 距离",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 2,
+          "values": [
+            1,
+            1.5,
+            2,
+            2.5,
+            4,
+            6
+          ],
+          "points": {
+            "1": 1,
+            "2": 0,
+            "4": -1,
+            "6": -2,
+            "1.5": 1,
+            "2.5": -1
+          },
+          "raw": {
+            "1": 1,
+            "2": 0,
+            "4": -1,
+            "6": -2,
+            "1.5": 1,
+            "2.5": -1
+          }
+        }
+      }
+    },
+    "skill.barrier": {
+      "_name": "屏障",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 7,
+      "_rows": 38,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 20,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "(兜底)@effect.0.then.0.payload.count": {
+          "key": "(兜底)",
+          "path": "effect.0.then.0.payload.count",
+          "label": "前摇 · 召唤 · 数量",
+          "group": "固有效果",
+          "unit": "",
+          "factoryValue": 1,
+          "values": [
+            -4,
+            -3,
+            0,
+            1
+          ],
+          "points": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          },
+          "raw": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          }
+        },
+        "lifetime@effect.0.then.0.payload.lifetime": {
+          "key": "lifetime",
+          "path": "effect.0.then.0.payload.lifetime",
+          "label": "前摇 · 召唤 · 飞行时间",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            0.5,
+            1,
+            1.5,
+            3,
+            8
+          ],
+          "points": {
+            "1": 0,
+            "3": 0,
+            "8": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "1": 0,
+            "3": 0,
+            "8": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.blink": {
+      "_name": "瞬影",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 5,
+      "_rows": 31,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "distance@effect.0.then.0.payload.distance.const": {
+          "key": "distance",
+          "path": "effect.0.then.0.payload.distance.const",
+          "label": "命中 · 传送 · 距离",
+          "group": "固有效果",
+          "unit": "",
+          "factoryValue": 1.5,
+          "values": [
+            1,
+            1.5,
+            2,
+            2.5,
+            4,
+            6
+          ],
+          "points": {
+            "1": 1,
+            "2": -1,
+            "4": -1,
+            "6": -2,
+            "1.5": 0,
+            "2.5": -1
+          },
+          "raw": {
+            "1": 1,
+            "2": -1,
+            "4": -1,
+            "6": -2,
+            "1.5": 0,
+            "2.5": -1
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.blood-offering": {
+      "_name": "血祭斩",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 8,
+      "_rows": 44,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 20,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "命中 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "radius@effect.0.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "effect.0.then.0.delivery.radius",
+          "label": "命中 · 伤害 · 半径",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 4,
+          "values": [
+            0.5,
+            1,
+            2.5,
+            4,
+            6
+          ],
+          "points": {
+            "1": 1,
+            "4": 0,
+            "6": -1,
+            "0.5": 1,
+            "2.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "4": 0,
+            "6": -1,
+            "0.5": 1,
+            "2.5": 1
+          }
+        },
+        "angle@effect.0.then.0.delivery.angle": {
+          "key": "angle",
+          "path": "effect.0.then.0.delivery.angle",
+          "label": "命中 · 伤害 · 张角",
+          "group": "固有效果",
+          "unit": "°",
+          "factoryValue": 120,
+          "values": [
+            45,
+            90,
+            120,
+            180,
+            360
+          ],
+          "points": {
+            "45": 0,
+            "90": 0,
+            "120": 0,
+            "180": 0,
+            "360": 0
+          },
+          "raw": {
+            "45": 0,
+            "90": 0,
+            "120": 0,
+            "180": 0,
+            "360": 0
+          }
+        },
+        "amount@effect.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "effect.0.then.0.payload.amount.const",
+          "label": "命中 · 伤害",
+          "group": "固有效果",
+          "unit": "点",
+          "factoryValue": 200,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 7,
+            "25": 6,
+            "30": 6,
+            "50": 5,
+            "200": 0
+          },
+          "raw": {
+            "10": 7,
+            "25": 6,
+            "30": 6,
+            "50": 5,
+            "200": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.blood-pact": {
+      "_name": "血契",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 4,
+      "_rows": 33,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "常驻 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "(兜底)@rules.0.then.0.payload.value.const": {
+          "key": "(兜底)",
+          "path": "rules.0.then.0.payload.value.const",
+          "label": "血量过低时 · 改属性 · 血契",
+          "group": "规则",
+          "unit": "血契",
+          "factoryValue": 3,
+          "values": [
+            1,
+            2,
+            3,
+            5,
+            8,
+            15,
+            30,
+            60,
+            100
+          ],
+          "points": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "15": 0,
+            "30": 0,
+            "60": 0,
+            "100": 0
+          },
+          "raw": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "15": 0,
+            "30": 0,
+            "60": 0,
+            "100": 0
+          }
+        },
+        "(兜底)@rules.1.then.0.payload.value.const": {
+          "key": "(兜底)",
+          "path": "rules.1.then.0.payload.value.const",
+          "label": "身上新挂上状态时 · 改属性 · 血契",
+          "group": "规则",
+          "unit": "血契",
+          "factoryValue": 2,
+          "values": [
+            1,
+            2,
+            3,
+            5,
+            8,
+            15,
+            30,
+            60,
+            100
+          ],
+          "points": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "15": 0,
+            "30": 0,
+            "60": 0,
+            "100": 0
+          },
+          "raw": {
+            "1": 0,
+            "2": 0,
+            "3": 0,
+            "5": 0,
+            "8": 0,
+            "15": 0,
+            "30": 0,
+            "60": 0,
+            "100": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.charge-dash": {
+      "_name": "突进",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 6,
+      "_rows": 35,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 10,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          },
+          "raw": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          }
+        },
+        "cooldown@phases.0.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.0.cost.cooldown",
+          "label": "前摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "distance@effect.0.then.0.payload.distance.const": {
+          "key": "distance",
+          "path": "effect.0.then.0.payload.distance.const",
+          "label": "前摇 · 位移 · 距离",
+          "group": "固有效果",
+          "unit": "",
+          "factoryValue": 6,
+          "values": [
+            1,
+            1.5,
+            2,
+            2.5,
+            4,
+            6
+          ],
+          "points": {
+            "1": 3,
+            "2": 2,
+            "4": 1,
+            "6": 0,
+            "1.5": 2,
+            "2.5": 2
+          },
+          "raw": {
+            "1": 3,
+            "2": 2,
+            "4": 1,
+            "6": 0,
+            "1.5": 2,
+            "2.5": 2
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.charged-laser": {
+      "_name": "贯日",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 7,
+      "_rows": 39,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "蓄力 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": -1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": -3,
+            "-1": 0,
+            "0.1": -4,
+            "0.2": -3,
+            "0.3": -3,
+            "0.5": -3
+          },
+          "raw": {
+            "1": -3,
+            "-1": 0,
+            "0.1": -4,
+            "0.2": -3,
+            "0.3": -3,
+            "0.5": -3
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "蓄力 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 30,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "命中 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "length@effect.0.then.0.delivery.length": {
+          "key": "length",
+          "path": "effect.0.then.0.delivery.length",
+          "label": "命中 · 伤害 · 长度",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 12,
+          "values": [
+            2,
+            4,
+            8,
+            12,
+            16
+          ],
+          "points": {
+            "2": 3,
+            "4": 2,
+            "8": 1,
+            "12": 0,
+            "16": -1
+          },
+          "raw": {
+            "2": 3,
+            "4": 2,
+            "8": 1,
+            "12": 0,
+            "16": -1
+          }
+        },
+        "width@effect.0.then.0.delivery.width": {
+          "key": "width",
+          "path": "effect.0.then.0.delivery.width",
+          "label": "命中 · 伤害 · 宽度",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 0.8,
+          "values": [
+            0.2,
+            0.4,
+            0.6,
+            0.8,
+            1.2
+          ],
+          "points": {
+            "0.2": 0,
+            "0.4": 0,
+            "0.6": 0,
+            "0.8": 0,
+            "1.2": 0
+          },
+          "raw": {
+            "0.2": 0,
+            "0.4": 0,
+            "0.6": 0,
+            "0.8": 0,
+            "1.2": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.charm": {
+      "_name": "策反",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 6,
+      "_rows": 36,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 30,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 20,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -4,
+            "3": -3,
+            "8": -2,
+            "20": 0
+          },
+          "raw": {
+            "2": -4,
+            "3": -3,
+            "8": -2,
+            "20": 0
+          }
+        },
+        "duration@effect.0.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "effect.0.then.0.payload.inline.duration",
+          "label": "前摇 · 挂状态 · 持续",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 10,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 3,
+            "5": 2,
+            "10": 0,
+            "25": -6,
+            "-1": 0,
+            "0.5": 4,
+            "1.5": 3
+          },
+          "raw": {
+            "3": 3,
+            "5": 2,
+            "10": 0,
+            "25": -6,
+            "-1": 0,
+            "0.5": 4,
+            "1.5": 3
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.cleave": {
+      "_name": "裂地斩",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 11,
+      "_rows": 61,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 10,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          },
+          "raw": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "duration@phases.2.duration": {
+          "key": "duration",
+          "path": "phases.2.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.2.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.2.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 3,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": 0,
+            "8": 1,
+            "20": 3
+          },
+          "raw": {
+            "2": -1,
+            "3": 0,
+            "8": 1,
+            "20": 3
+          }
+        },
+        "radius@effect.0.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "effect.0.then.0.delivery.radius",
+          "label": "命中 · 伤害 · 半径",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 2.5,
+          "values": [
+            0.5,
+            1,
+            2.5,
+            4,
+            6
+          ],
+          "points": {
+            "1": 1,
+            "4": -1,
+            "6": -1,
+            "0.5": 1,
+            "2.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "4": -1,
+            "6": -1,
+            "0.5": 1,
+            "2.5": 0
+          }
+        },
+        "angle@effect.0.then.0.delivery.angle": {
+          "key": "angle",
+          "path": "effect.0.then.0.delivery.angle",
+          "label": "命中 · 伤害 · 张角",
+          "group": "固有效果",
+          "unit": "°",
+          "factoryValue": 120,
+          "values": [
+            45,
+            90,
+            120,
+            180,
+            360
+          ],
+          "points": {
+            "45": 0,
+            "90": 0,
+            "120": 0,
+            "180": 0,
+            "360": 0
+          },
+          "raw": {
+            "45": 0,
+            "90": 0,
+            "120": 0,
+            "180": 0,
+            "360": 0
+          }
+        },
+        "amount@effect.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "effect.0.then.0.payload.amount.const",
+          "label": "命中 · 伤害",
+          "group": "固有效果",
+          "unit": "点",
+          "factoryValue": 30,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 1,
+            "25": 1,
+            "30": 0,
+            "50": -1,
+            "200": -6
+          },
+          "raw": {
+            "10": 1,
+            "25": 1,
+            "30": 0,
+            "50": -1,
+            "200": -6
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        },
+        "duration@rules.0.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.0.then.0.payload.inline.duration",
+          "label": "命中时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 3,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 0,
+            "5": -1,
+            "10": -1,
+            "25": -2,
+            "-1": -1,
+            "0.5": 1,
+            "1.5": 1
+          },
+          "raw": {
+            "3": 0,
+            "5": -1,
+            "10": -1,
+            "25": -2,
+            "-1": -1,
+            "0.5": 1,
+            "1.5": 1
+          }
+        },
+        "(兜底)@rules.0.then.0.payload.inline.modifiers.0.value.const": {
+          "key": "(兜底)",
+          "path": "rules.0.then.0.payload.inline.modifiers.0.value.const",
+          "label": "命中时 · 挂状态 · 受伤倍率",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 1.15,
+          "values": [
+            0.5,
+            0.8,
+            0.9,
+            1.15
+          ],
+          "points": {
+            "0.5": 1,
+            "0.8": 1,
+            "0.9": 1,
+            "1.15": 0
+          },
+          "raw": {
+            "0.5": 1,
+            "0.8": 1,
+            "0.9": 1,
+            "1.15": 0
+          }
+        }
+      }
+    },
+    "skill.curse-of-undead": {
+      "_name": "亡灵诅咒",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 7,
+      "_rows": 40,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 10,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          },
+          "raw": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "duration@effect.0.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "effect.0.then.0.payload.inline.duration",
+          "label": "前摇 · 挂状态 · 持续",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 5,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 1,
+            "5": 0,
+            "10": -1,
+            "25": -6,
+            "-1": -1,
+            "0.5": 1,
+            "1.5": 1
+          },
+          "raw": {
+            "3": 1,
+            "5": 0,
+            "10": -1,
+            "25": -6,
+            "-1": -1,
+            "0.5": 1,
+            "1.5": 1
+          }
+        },
+        "(兜底)@effect.0.then.0.payload.inline.hooks.0.then.0.payload.value.const": {
+          "key": "(兜底)",
+          "path": "effect.0.then.0.payload.inline.hooks.0.then.0.payload.value.const",
+          "label": "前摇 · 挂状态 · 修正阶段 · 改属性 · 治疗/伤害反转",
+          "group": "固有效果",
+          "unit": "",
+          "factoryValue": 1,
+          "values": [
+            -4,
+            -3,
+            0,
+            1
+          ],
+          "points": {
+            "0": 1,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          },
+          "raw": {
+            "0": 1,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.flame-wall": {
+      "_name": "火墙",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 7,
+      "_rows": 39,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 20,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "radius@effect.0.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "effect.0.then.0.delivery.radius",
+          "label": "前摇 · 伤害 · 半径",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 2.5,
+          "values": [
+            2.5,
+            4,
+            6,
+            12,
+            18
+          ],
+          "points": {
+            "4": -1,
+            "6": -1,
+            "12": -2,
+            "18": -3,
+            "2.5": 0
+          },
+          "raw": {
+            "4": -1,
+            "6": -1,
+            "12": -2,
+            "18": -3,
+            "2.5": 0
+          }
+        },
+        "amount@effect.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "effect.0.then.0.payload.amount.const",
+          "label": "前摇 · 伤害",
+          "group": "固有效果",
+          "unit": "点",
+          "factoryValue": 50,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 1,
+            "25": 1,
+            "30": 1,
+            "50": 0,
+            "200": -5
+          },
+          "raw": {
+            "10": 1,
+            "25": 1,
+            "30": 1,
+            "50": 0,
+            "200": -5
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.frost-lock": {
+      "_name": "寒冰锁",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 10,
+      "_rows": 56,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 40,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -2,
+            "20": -1,
+            "30": -1,
+            "40": 0
+          },
+          "raw": {
+            "10": -2,
+            "20": -1,
+            "30": -1,
+            "40": 0
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "命中 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "speed@effect.0.then.0.delivery.speed": {
+          "key": "speed",
+          "path": "effect.0.then.0.delivery.speed",
+          "label": "命中 · 伤害 · 速度",
+          "group": "固有效果",
+          "unit": "m/s",
+          "factoryValue": 12,
+          "values": [
+            4,
+            8,
+            12,
+            16,
+            24
+          ],
+          "points": {
+            "4": 0,
+            "8": 0,
+            "12": 0,
+            "16": 0,
+            "24": 0
+          },
+          "raw": {
+            "4": 0,
+            "8": 0,
+            "12": 0,
+            "16": 0,
+            "24": 0
+          }
+        },
+        "lifetime@effect.0.then.0.delivery.lifetime": {
+          "key": "lifetime",
+          "path": "effect.0.then.0.delivery.lifetime",
+          "label": "命中 · 伤害 · 飞行时间",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 1.5,
+          "values": [
+            0.5,
+            1,
+            1.5,
+            3,
+            8
+          ],
+          "points": {
+            "1": 0,
+            "3": 0,
+            "8": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "1": 0,
+            "3": 0,
+            "8": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "radius@effect.0.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "effect.0.then.0.delivery.radius",
+          "label": "命中 · 伤害 · 半径",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 0.5,
+          "values": [
+            0.5,
+            1,
+            2.5,
+            4,
+            6
+          ],
+          "points": {
+            "1": 0,
+            "4": 0,
+            "6": 0,
+            "0.5": 0,
+            "2.5": 0
+          },
+          "raw": {
+            "1": 0,
+            "4": 0,
+            "6": 0,
+            "0.5": 0,
+            "2.5": 0
+          }
+        },
+        "amount@effect.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "effect.0.then.0.payload.amount.const",
+          "label": "命中 · 伤害",
+          "group": "固有效果",
+          "unit": "点",
+          "factoryValue": 25,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 1,
+            "25": 0,
+            "30": -1,
+            "50": -1,
+            "200": -6
+          },
+          "raw": {
+            "10": 1,
+            "25": 0,
+            "30": -1,
+            "50": -1,
+            "200": -6
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        },
+        "duration@rules.0.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.0.then.0.payload.inline.duration",
+          "label": "命中时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 1.5,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": -3,
+            "5": -6,
+            "10": -14,
+            "25": -39,
+            "-1": -14,
+            "0.5": 2,
+            "1.5": 0
+          },
+          "raw": {
+            "3": -3,
+            "5": -6,
+            "10": -14,
+            "25": -39,
+            "-1": -14,
+            "0.5": 2,
+            "1.5": 0
+          }
+        }
+      }
+    },
+    "skill.holy-light": {
+      "_name": "圣光术",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 7,
+      "_rows": 39,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 20,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "radius@effect.0.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "effect.0.then.0.delivery.radius",
+          "label": "前摇 · 治疗 · 半径",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 4,
+          "values": [
+            2.5,
+            4,
+            6,
+            12,
+            18
+          ],
+          "points": {
+            "4": 0,
+            "6": -1,
+            "12": -2,
+            "18": -3,
+            "2.5": 1
+          },
+          "raw": {
+            "4": 0,
+            "6": -1,
+            "12": -2,
+            "18": -3,
+            "2.5": 1
+          }
+        },
+        "amount@effect.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "effect.0.then.0.payload.amount.const",
+          "label": "前摇 · 治疗 · 治疗量",
+          "group": "固有效果",
+          "unit": "点",
+          "factoryValue": 30,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 2,
+            "25": 1,
+            "30": 0,
+            "50": -2,
+            "200": -17
+          },
+          "raw": {
+            "10": 2,
+            "25": 1,
+            "30": 0,
+            "50": -2,
+            "200": -17
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.hunt": {
+      "_name": "猎杀",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 10,
+      "_rows": 54,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 10,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          },
+          "raw": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "命中 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 3,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": 0,
+            "8": 1,
+            "20": 3
+          },
+          "raw": {
+            "2": -1,
+            "3": 0,
+            "8": 1,
+            "20": 3
+          }
+        },
+        "speed@effect.0.then.0.delivery.speed": {
+          "key": "speed",
+          "path": "effect.0.then.0.delivery.speed",
+          "label": "命中 · 伤害 · 速度",
+          "group": "固有效果",
+          "unit": "m/s",
+          "factoryValue": 12,
+          "values": [
+            4,
+            8,
+            12,
+            16,
+            24
+          ],
+          "points": {
+            "4": 0,
+            "8": 0,
+            "12": 0,
+            "16": 0,
+            "24": 0
+          },
+          "raw": {
+            "4": 0,
+            "8": 0,
+            "12": 0,
+            "16": 0,
+            "24": 0
+          }
+        },
+        "lifetime@effect.0.then.0.delivery.lifetime": {
+          "key": "lifetime",
+          "path": "effect.0.then.0.delivery.lifetime",
+          "label": "命中 · 伤害 · 飞行时间",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 1.5,
+          "values": [
+            0.5,
+            1,
+            1.5,
+            3,
+            8
+          ],
+          "points": {
+            "1": 0,
+            "3": 0,
+            "8": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "1": 0,
+            "3": 0,
+            "8": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "radius@effect.0.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "effect.0.then.0.delivery.radius",
+          "label": "命中 · 伤害 · 半径",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 0.5,
+          "values": [
+            0.5,
+            1,
+            2.5,
+            4,
+            6
+          ],
+          "points": {
+            "1": 0,
+            "4": 0,
+            "6": 0,
+            "0.5": 0,
+            "2.5": 0
+          },
+          "raw": {
+            "1": 0,
+            "4": 0,
+            "6": 0,
+            "0.5": 0,
+            "2.5": 0
+          }
+        },
+        "amount@effect.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "effect.0.then.0.payload.amount.const",
+          "label": "命中 · 伤害",
+          "group": "固有效果",
+          "unit": "点",
+          "factoryValue": 25,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 1,
+            "25": 0,
+            "30": -1,
+            "50": -1,
+            "200": -6
+          },
+          "raw": {
+            "10": 1,
+            "25": 0,
+            "30": -1,
+            "50": -1,
+            "200": -6
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        },
+        "amount@rules.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "rules.0.then.0.payload.amount.const",
+          "label": "命中时 · 伤害",
+          "group": "规则",
+          "unit": "点",
+          "factoryValue": 25,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 1,
+            "25": 0,
+            "30": -1,
+            "50": -1,
+            "200": -6
+          },
+          "raw": {
+            "10": 1,
+            "25": 0,
+            "30": -1,
+            "50": -1,
+            "200": -6
+          }
+        }
+      }
+    },
+    "skill.hunter-instinct": {
+      "_name": "猎手直觉",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 5,
+      "_rows": 31,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "常驻 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "duration@rules.0.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.0.then.0.payload.inline.duration",
+          "label": "施放时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": -1,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": -1,
+            "5": -1,
+            "10": 0,
+            "25": 1,
+            "-1": 0,
+            "0.5": -1,
+            "1.5": -1
+          },
+          "raw": {
+            "3": -1,
+            "5": -1,
+            "10": 0,
+            "25": 1,
+            "-1": 0,
+            "0.5": -1,
+            "1.5": -1
+          }
+        },
+        "(兜底)@rules.0.then.0.payload.inline.modifiers.0.value.const": {
+          "key": "(兜底)",
+          "path": "rules.0.then.0.payload.inline.modifiers.0.value.const",
+          "label": "施放时 · 挂状态 · 生命上限",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 0.9,
+          "values": [
+            0.5,
+            0.8,
+            0.9,
+            1.15
+          ],
+          "points": {
+            "0.5": 2,
+            "0.8": 1,
+            "0.9": 0,
+            "1.15": -1
+          },
+          "raw": {
+            "0.5": 2,
+            "0.8": 1,
+            "0.9": 0,
+            "1.15": -1
+          }
+        },
+        "amount@rules.1.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "rules.1.then.0.payload.amount.const",
+          "label": "暴击时 · 治疗 · 治疗量",
+          "group": "规则",
+          "unit": "点",
+          "factoryValue": 10,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 0,
+            "25": -1,
+            "30": -2,
+            "50": -4,
+            "200": -19
+          },
+          "raw": {
+            "10": 0,
+            "25": -1,
+            "30": -2,
+            "50": -4,
+            "200": -19
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.impact-burst": {
+      "_name": "冲击波",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 4,
+      "_rows": 24,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "命中 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 20,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          }
+        },
+        "amount@effect.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "effect.0.then.0.payload.amount.const",
+          "label": "命中 · 伤害",
+          "group": "固有效果",
+          "unit": "点",
+          "factoryValue": 25,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 1,
+            "25": 0,
+            "30": -1,
+            "50": -1,
+            "200": -6
+          },
+          "raw": {
+            "10": 1,
+            "25": 0,
+            "30": -1,
+            "50": -1,
+            "200": -6
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.infinity": {
+      "_name": "无下限",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 9,
+      "_rows": 52,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "every@rules.0.every": {
+          "key": "every",
+          "path": "rules.0.every",
+          "label": "每 0.25 秒 · 间隔",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 0.25,
+          "values": [
+            0.1,
+            0.25,
+            0.5,
+            1,
+            2
+          ],
+          "points": {
+            "1": 0,
+            "2": 0,
+            "0.1": 0,
+            "0.25": 0,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 0,
+            "2": 0,
+            "0.1": 0,
+            "0.25": 0,
+            "0.5": 0
+          }
+        },
+        "radius@rules.0.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "rules.0.then.0.delivery.radius",
+          "label": "每 0.25 秒 · 挂状态 · 半径",
+          "group": "规则",
+          "unit": "m",
+          "factoryValue": 6,
+          "values": [
+            2.5,
+            4,
+            6,
+            12,
+            18
+          ],
+          "points": {
+            "4": 2,
+            "6": 0,
+            "12": -5,
+            "18": -10,
+            "2.5": 3
+          },
+          "raw": {
+            "4": 2,
+            "6": 0,
+            "12": -5,
+            "18": -10,
+            "2.5": 3
+          }
+        },
+        "duration@rules.0.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.0.then.0.payload.inline.duration",
+          "label": "每 0.25 秒 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "every@rules.1.every": {
+          "key": "every",
+          "path": "rules.1.every",
+          "label": "每 0.5 秒 · 间隔",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            0.1,
+            0.25,
+            0.5,
+            1,
+            2
+          ],
+          "points": {
+            "1": -1,
+            "2": -1,
+            "0.1": 1,
+            "0.25": 1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": -1,
+            "2": -1,
+            "0.1": 1,
+            "0.25": 1,
+            "0.5": 0
+          }
+        },
+        "(兜底)@rules.1.then.0.payload.value.const": {
+          "key": "(兜底)",
+          "path": "rules.1.then.0.payload.value.const",
+          "label": "每 0.5 秒 · 改属性 · 能量",
+          "group": "规则",
+          "unit": "能量",
+          "factoryValue": -4,
+          "values": [
+            -4,
+            -3,
+            0,
+            1
+          ],
+          "points": {
+            "0": -1,
+            "1": -1,
+            "-4": 0,
+            "-3": -1
+          },
+          "raw": {
+            "0": -1,
+            "1": -1,
+            "-4": 0,
+            "-3": -1
+          }
+        },
+        "duration@rules.2.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.2.then.0.payload.inline.duration",
+          "label": "施放时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": -1,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": -1,
+            "5": -1,
+            "10": 0,
+            "25": 2,
+            "-1": 0,
+            "0.5": -1,
+            "1.5": -1
+          },
+          "raw": {
+            "3": -1,
+            "5": -1,
+            "10": 0,
+            "25": 2,
+            "-1": 0,
+            "0.5": -1,
+            "1.5": -1
+          }
+        },
+        "(兜底)@rules.2.then.0.payload.inline.modifiers.0.value.const": {
+          "key": "(兜底)",
+          "path": "rules.2.then.0.payload.inline.modifiers.0.value.const",
+          "label": "施放时 · 挂状态 · 能量上限",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 0.8,
+          "values": [
+            0.5,
+            0.8,
+            0.9,
+            1.15
+          ],
+          "points": {
+            "0.5": 2,
+            "0.8": 0,
+            "0.9": -1,
+            "1.15": -2
+          },
+          "raw": {
+            "0.5": 2,
+            "0.8": 0,
+            "0.9": -1,
+            "1.15": -2
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.insight": {
+      "_name": "洞察",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 8,
+      "_rows": 46,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 10,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          },
+          "raw": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "radius@effect.0.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "effect.0.then.0.delivery.radius",
+          "label": "前摇 · 感知 · 半径",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 12,
+          "values": [
+            2.5,
+            4,
+            6,
+            12,
+            18
+          ],
+          "points": {
+            "4": 2,
+            "6": 1,
+            "12": 0,
+            "18": -1,
+            "2.5": 2
+          },
+          "raw": {
+            "4": 2,
+            "6": 1,
+            "12": 0,
+            "18": -1,
+            "2.5": 2
+          }
+        },
+        "radius@effect.1.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "effect.1.then.0.delivery.radius",
+          "label": "前摇 · 感知 · 半径",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 12,
+          "values": [
+            2.5,
+            4,
+            6,
+            12,
+            18
+          ],
+          "points": {
+            "4": 2,
+            "6": 1,
+            "12": 0,
+            "18": -1,
+            "2.5": 2
+          },
+          "raw": {
+            "4": 2,
+            "6": 1,
+            "12": 0,
+            "18": -1,
+            "2.5": 2
+          }
+        },
+        "duration@effect.1.then.0.payload.duration": {
+          "key": "duration",
+          "path": "effect.1.then.0.payload.duration",
+          "label": "前摇 · 感知 · 持续",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 10,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.iron-shirt": {
+      "_name": "铁布衫",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 8,
+      "_rows": 44,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 20,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "duration@effect.0.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "effect.0.then.0.payload.inline.duration",
+          "label": "前摇 · 挂状态 · 持续",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 3,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 0,
+            "5": -2,
+            "10": -6,
+            "25": -19,
+            "-1": -6,
+            "0.5": 2,
+            "1.5": 1
+          },
+          "raw": {
+            "3": 0,
+            "5": -2,
+            "10": -6,
+            "25": -19,
+            "-1": -6,
+            "0.5": 2,
+            "1.5": 1
+          }
+        },
+        "(兜底)@effect.0.then.0.payload.inline.modifiers.0.value.const": {
+          "key": "(兜底)",
+          "path": "effect.0.then.0.payload.inline.modifiers.0.value.const",
+          "label": "前摇 · 挂状态 · 移速",
+          "group": "固有效果",
+          "unit": "",
+          "factoryValue": 0.5,
+          "values": [
+            0.5,
+            0.8,
+            0.9,
+            1.15
+          ],
+          "points": {
+            "0.5": 0,
+            "0.8": -1,
+            "0.9": -1,
+            "1.15": -1
+          },
+          "raw": {
+            "0.5": 0,
+            "0.8": -1,
+            "0.9": -1,
+            "1.15": -1
+          }
+        },
+        "(兜底)@effect.0.then.0.payload.inline.modifiers.1.value.const": {
+          "key": "(兜底)",
+          "path": "effect.0.then.0.payload.inline.modifiers.1.value.const",
+          "label": "前摇 · 挂状态 · 受伤倍率",
+          "group": "固有效果",
+          "unit": "",
+          "factoryValue": 0.8,
+          "values": [
+            0.5,
+            0.8,
+            0.9,
+            1.15
+          ],
+          "points": {
+            "0.5": -1,
+            "0.8": 0,
+            "0.9": 1,
+            "1.15": 1
+          },
+          "raw": {
+            "0.5": -1,
+            "0.8": 0,
+            "0.9": 1,
+            "1.15": 1
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.last-stand-shield": {
+      "_name": "背水 · 撑盾",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 7,
+      "_rows": 41,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 30,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "duration@rules.0.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.0.then.0.payload.inline.duration",
+          "label": "后摇 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 5,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "perStack@rules.0.then.0.payload.inline.hooks.0.absorb.perStack": {
+          "key": "perStack",
+          "path": "rules.0.then.0.payload.inline.hooks.0.absorb.perStack",
+          "label": "后摇 · 挂状态 · 吸收阶段 · 吸收量",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 100,
+          "values": [
+            50,
+            100,
+            150,
+            250,
+            500
+          ],
+          "points": {
+            "50": 2,
+            "100": 0,
+            "150": -2,
+            "250": -5,
+            "500": -14
+          },
+          "raw": {
+            "50": 2,
+            "100": 0,
+            "150": -2,
+            "250": -5,
+            "500": -14
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.lava-armor": {
+      "_name": "熔岩护甲",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 11,
+      "_rows": 63,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "duration@effect.0.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "effect.0.then.0.payload.inline.duration",
+          "label": "命中 · 挂状态 · 持续",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 10,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 5,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 6,
+            "1": 5,
+            "2": 4,
+            "3": 3,
+            "4": 2,
+            "5": 0,
+            "6": -1,
+            "7": -3,
+            "8": -4
+          },
+          "raw": {
+            "0": 6,
+            "1": 5,
+            "2": 4,
+            "3": 3,
+            "4": 2,
+            "5": 0,
+            "6": -1,
+            "7": -3,
+            "8": -4
+          }
+        },
+        "every@rules.0.every": {
+          "key": "every",
+          "path": "rules.0.every",
+          "label": "每 0.5 秒 · 间隔",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            0.1,
+            0.25,
+            0.5,
+            1,
+            2
+          ],
+          "points": {
+            "1": -1,
+            "2": -1,
+            "0.1": 1,
+            "0.25": 1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": -1,
+            "2": -1,
+            "0.1": 1,
+            "0.25": 1,
+            "0.5": 0
+          }
+        },
+        "(兜底)@rules.0.then.0.payload.value.const": {
+          "key": "(兜底)",
+          "path": "rules.0.then.0.payload.value.const",
+          "label": "每 0.5 秒 · 改属性 · 能量",
+          "group": "规则",
+          "unit": "能量",
+          "factoryValue": -3,
+          "values": [
+            -4,
+            -3,
+            0,
+            1
+          ],
+          "points": {
+            "0": -1,
+            "1": -1,
+            "-4": 1,
+            "-3": 0
+          },
+          "raw": {
+            "0": -1,
+            "1": -1,
+            "-4": 1,
+            "-3": 0
+          }
+        },
+        "radius@rules.1.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "rules.1.then.0.delivery.radius",
+          "label": "被打时 · 伤害 · 半径",
+          "group": "规则",
+          "unit": "m",
+          "factoryValue": 2.5,
+          "values": [
+            2.5,
+            4,
+            6,
+            12,
+            18
+          ],
+          "points": {
+            "4": -1,
+            "6": -1,
+            "12": -2,
+            "18": -3,
+            "2.5": 0
+          },
+          "raw": {
+            "4": -1,
+            "6": -1,
+            "12": -2,
+            "18": -3,
+            "2.5": 0
+          }
+        },
+        "amount@rules.1.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "rules.1.then.0.payload.amount.const",
+          "label": "被打时 · 伤害",
+          "group": "规则",
+          "unit": "点",
+          "factoryValue": 30,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 1,
+            "25": 1,
+            "30": 0,
+            "50": -1,
+            "200": -6
+          },
+          "raw": {
+            "10": 1,
+            "25": 1,
+            "30": 0,
+            "50": -1,
+            "200": -6
+          }
+        },
+        "duration@rules.2.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.2.then.0.payload.inline.duration",
+          "label": "施放时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 10,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": -1,
+            "5": -1,
+            "10": 0,
+            "25": 2,
+            "-1": 0,
+            "0.5": -1,
+            "1.5": -1
+          },
+          "raw": {
+            "3": -1,
+            "5": -1,
+            "10": 0,
+            "25": 2,
+            "-1": 0,
+            "0.5": -1,
+            "1.5": -1
+          }
+        },
+        "(兜底)@rules.2.then.0.payload.inline.modifiers.0.value.const": {
+          "key": "(兜底)",
+          "path": "rules.2.then.0.payload.inline.modifiers.0.value.const",
+          "label": "施放时 · 挂状态 · 移速",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 0.8,
+          "values": [
+            0.5,
+            0.8,
+            0.9,
+            1.15
+          ],
+          "points": {
+            "0.5": 2,
+            "0.8": 0,
+            "0.9": -1,
+            "1.15": -2
+          },
+          "raw": {
+            "0.5": 2,
+            "0.8": 0,
+            "0.9": -1,
+            "1.15": -2
+          }
+        },
+        "duration@rules.3.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.3.then.0.payload.inline.duration",
+          "label": "施放时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 10,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": -1,
+            "5": -1,
+            "10": 0,
+            "25": 1,
+            "-1": 0,
+            "0.5": -1,
+            "1.5": -1
+          },
+          "raw": {
+            "3": -1,
+            "5": -1,
+            "10": 0,
+            "25": 1,
+            "-1": 0,
+            "0.5": -1,
+            "1.5": -1
+          }
+        },
+        "(兜底)@rules.3.then.0.payload.inline.modifiers.0.value.const": {
+          "key": "(兜底)",
+          "path": "rules.3.then.0.payload.inline.modifiers.0.value.const",
+          "label": "施放时 · 挂状态 · 生命上限",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 0.9,
+          "values": [
+            0.5,
+            0.8,
+            0.9,
+            1.15
+          ],
+          "points": {
+            "0.5": 2,
+            "0.8": 1,
+            "0.9": 0,
+            "1.15": -1
+          },
+          "raw": {
+            "0.5": 2,
+            "0.8": 1,
+            "0.9": 0,
+            "1.15": -1
+          }
+        }
+      }
+    },
+    "skill.magic-bolt": {
+      "_name": "魔法飞弹",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 8,
+      "_rows": 43,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "命中 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 10,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          },
+          "raw": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          }
+        },
+        "cooldown@phases.0.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.0.cost.cooldown",
+          "label": "命中 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 2,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": 0,
+            "3": 1,
+            "8": 1,
+            "20": 4
+          },
+          "raw": {
+            "2": 0,
+            "3": 1,
+            "8": 1,
+            "20": 4
+          }
+        },
+        "speed@effect.0.then.0.delivery.speed": {
+          "key": "speed",
+          "path": "effect.0.then.0.delivery.speed",
+          "label": "命中 · 伤害 · 速度",
+          "group": "固有效果",
+          "unit": "m/s",
+          "factoryValue": 12,
+          "values": [
+            4,
+            8,
+            12,
+            16,
+            24
+          ],
+          "points": {
+            "4": 0,
+            "8": 0,
+            "12": 0,
+            "16": 0,
+            "24": 0
+          },
+          "raw": {
+            "4": 0,
+            "8": 0,
+            "12": 0,
+            "16": 0,
+            "24": 0
+          }
+        },
+        "lifetime@effect.0.then.0.delivery.lifetime": {
+          "key": "lifetime",
+          "path": "effect.0.then.0.delivery.lifetime",
+          "label": "命中 · 伤害 · 飞行时间",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 1.5,
+          "values": [
+            0.5,
+            1,
+            1.5,
+            3,
+            8
+          ],
+          "points": {
+            "1": 0,
+            "3": 0,
+            "8": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "1": 0,
+            "3": 0,
+            "8": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "radius@effect.0.then.0.delivery.radius": {
+          "key": "radius",
+          "path": "effect.0.then.0.delivery.radius",
+          "label": "命中 · 伤害 · 半径",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 0.5,
+          "values": [
+            0.5,
+            1,
+            2.5,
+            4,
+            6
+          ],
+          "points": {
+            "1": 0,
+            "4": 0,
+            "6": 0,
+            "0.5": 0,
+            "2.5": 0
+          },
+          "raw": {
+            "1": 0,
+            "4": 0,
+            "6": 0,
+            "0.5": 0,
+            "2.5": 0
+          }
+        },
+        "amount@effect.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "effect.0.then.0.payload.amount.const",
+          "label": "命中 · 伤害",
+          "group": "固有效果",
+          "unit": "点",
+          "factoryValue": 25,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 1,
+            "25": 0,
+            "30": -1,
+            "50": -1,
+            "200": -6
+          },
+          "raw": {
+            "10": 1,
+            "25": 0,
+            "30": -1,
+            "50": -1,
+            "200": -6
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.mark": {
+      "_name": "标记",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 4,
+      "_rows": 26,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 10,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          },
+          "raw": {
+            "10": 0,
+            "20": 1,
+            "30": 1,
+            "40": 2
+          }
+        },
+        "duration@effect.0.then.0.payload.duration": {
+          "key": "duration",
+          "path": "effect.0.then.0.payload.duration",
+          "label": "前摇 · 感知 · 持续",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 5,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.named-blade": {
+      "_name": "名刀·司命",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 9,
+      "_rows": 52,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "常驻 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "(兜底)@rules.0.then.0.payload.value.const": {
+          "key": "(兜底)",
+          "path": "rules.0.then.0.payload.value.const",
+          "label": "受到致命伤时 · 改属性 · 这一下的数值",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 1,
+          "values": [
+            -4,
+            -3,
+            0,
+            1
+          ],
+          "points": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          },
+          "raw": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          }
+        },
+        "duration@rules.0.then.1.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.0.then.1.payload.inline.duration",
+          "label": "受到致命伤时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 1.5,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "(兜底)@rules.0.then.1.payload.inline.hooks.0.then.0.payload.value.const": {
+          "key": "(兜底)",
+          "path": "rules.0.then.1.payload.inline.hooks.0.then.0.payload.value.const",
+          "label": "受到致命伤时 · 挂状态 · 拦截阶段 · 改属性 · 这一下的数值",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 1,
+          "values": [
+            -4,
+            -3,
+            0,
+            1
+          ],
+          "points": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          },
+          "raw": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          }
+        },
+        "duration@rules.0.then.2.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.0.then.2.payload.inline.duration",
+          "label": "受到致命伤时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 25,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "duration@rules.1.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.1.then.0.payload.inline.duration",
+          "label": "施放时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": -1,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": -1,
+            "5": -1,
+            "10": 0,
+            "25": 3,
+            "-1": 0,
+            "0.5": -2,
+            "1.5": -2
+          },
+          "raw": {
+            "3": -1,
+            "5": -1,
+            "10": 0,
+            "25": 3,
+            "-1": 0,
+            "0.5": -2,
+            "1.5": -2
+          }
+        },
+        "(兜底)@rules.1.then.0.payload.inline.modifiers.0.value.const": {
+          "key": "(兜底)",
+          "path": "rules.1.then.0.payload.inline.modifiers.0.value.const",
+          "label": "施放时 · 挂状态 · 生命上限",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 0.8,
+          "values": [
+            0.5,
+            0.8,
+            0.9,
+            1.15
+          ],
+          "points": {
+            "0.5": 2,
+            "0.8": 0,
+            "0.9": -1,
+            "1.15": -2
+          },
+          "raw": {
+            "0.5": 2,
+            "0.8": 0,
+            "0.9": -1,
+            "1.15": -2
+          }
+        },
+        "(兜底)@rules.1.then.0.payload.inline.modifiers.1.value.const": {
+          "key": "(兜底)",
+          "path": "rules.1.then.0.payload.inline.modifiers.1.value.const",
+          "label": "施放时 · 挂状态 · 移速倍率",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 0.9,
+          "values": [
+            0.5,
+            0.8,
+            0.9,
+            1.15
+          ],
+          "points": {
+            "0.5": 2,
+            "0.8": 1,
+            "0.9": 0,
+            "1.15": -1
+          },
+          "raw": {
+            "0.5": 2,
+            "0.8": 1,
+            "0.9": 0,
+            "1.15": -1
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.place-slow-field": {
+      "_name": "布场",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 7,
+      "_rows": 38,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 30,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "(兜底)@effect.0.then.0.payload.count": {
+          "key": "(兜底)",
+          "path": "effect.0.then.0.payload.count",
+          "label": "前摇 · 召唤 · 数量",
+          "group": "固有效果",
+          "unit": "",
+          "factoryValue": 1,
+          "values": [
+            -4,
+            -3,
+            0,
+            1
+          ],
+          "points": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          },
+          "raw": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          }
+        },
+        "lifetime@effect.0.then.0.payload.lifetime": {
+          "key": "lifetime",
+          "path": "effect.0.then.0.payload.lifetime",
+          "label": "前摇 · 召唤 · 飞行时间",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 3,
+          "values": [
+            0.5,
+            1,
+            1.5,
+            3,
+            8
+          ],
+          "points": {
+            "1": 0,
+            "3": 0,
+            "8": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "1": 0,
+            "3": 0,
+            "8": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.raise-dead": {
+      "_name": "亡灵复生",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 6,
+      "_rows": 33,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.5,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": 0
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 30,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": -1,
+            "30": 0,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 20,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -4,
+            "3": -3,
+            "8": -2,
+            "20": 0
+          },
+          "raw": {
+            "2": -4,
+            "3": -3,
+            "8": -2,
+            "20": 0
+          }
+        },
+        "(兜底)@effect.0.then.0.payload.count": {
+          "key": "(兜底)",
+          "path": "effect.0.then.0.payload.count",
+          "label": "前摇 · 召唤 · 数量",
+          "group": "固有效果",
+          "unit": "",
+          "factoryValue": 1,
+          "values": [
+            -4,
+            -3,
+            0,
+            1
+          ],
+          "points": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          },
+          "raw": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.slow-field": {
+      "_name": "迟滞场",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 4,
+      "_rows": 26,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "常驻 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "duration@rules.0.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.0.then.0.payload.inline.duration",
+          "label": "进入范围时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": -1,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 2,
+            "5": 2,
+            "10": 0,
+            "25": -4,
+            "-1": 0,
+            "0.5": 3,
+            "1.5": 3
+          },
+          "raw": {
+            "3": 2,
+            "5": 2,
+            "10": 0,
+            "25": -4,
+            "-1": 0,
+            "0.5": 3,
+            "1.5": 3
+          }
+        },
+        "(兜底)@rules.0.then.0.payload.inline.modifiers.0.value.const": {
+          "key": "(兜底)",
+          "path": "rules.0.then.0.payload.inline.modifiers.0.value.const",
+          "label": "进入范围时 · 挂状态 · 移速",
+          "group": "规则",
+          "unit": "",
+          "factoryValue": 0.5,
+          "values": [
+            0.5,
+            0.8,
+            0.9,
+            1.15
+          ],
+          "points": {
+            "0.5": 0,
+            "0.8": 2,
+            "0.9": 2,
+            "1.15": 4
+          },
+          "raw": {
+            "0.5": 0,
+            "0.8": 2,
+            "0.9": 2,
+            "1.15": 4
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.soul-rend": {
+      "_name": "裂魂",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 11,
+      "_rows": 59,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 0,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": -1
+          },
+          "raw": {
+            "1": 0,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": -1,
+            "0.5": -1
+          }
+        },
+        "cooldown@phases.0.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.0.cost.cooldown",
+          "label": "命中 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 20,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -4,
+            "3": -3,
+            "8": -2,
+            "20": 0
+          },
+          "raw": {
+            "2": -4,
+            "3": -3,
+            "8": -2,
+            "20": 0
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "命中 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 40,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": -1,
+            "30": -1,
+            "40": 0
+          },
+          "raw": {
+            "10": -1,
+            "20": -1,
+            "30": -1,
+            "40": 0
+          }
+        },
+        "length@effect.0.then.0.delivery.length": {
+          "key": "length",
+          "path": "effect.0.then.0.delivery.length",
+          "label": "命中 · 伤害 · 长度",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 8,
+          "values": [
+            2,
+            4,
+            8,
+            12,
+            16
+          ],
+          "points": {
+            "2": 2,
+            "4": 1,
+            "8": 0,
+            "12": -1,
+            "16": -2
+          },
+          "raw": {
+            "2": 2,
+            "4": 1,
+            "8": 0,
+            "12": -1,
+            "16": -2
+          }
+        },
+        "width@effect.0.then.0.delivery.width": {
+          "key": "width",
+          "path": "effect.0.then.0.delivery.width",
+          "label": "命中 · 伤害 · 宽度",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 0.6,
+          "values": [
+            0.2,
+            0.4,
+            0.6,
+            0.8,
+            1.2
+          ],
+          "points": {
+            "0.2": 0,
+            "0.4": 0,
+            "0.6": 0,
+            "0.8": 0,
+            "1.2": 0
+          },
+          "raw": {
+            "0.2": 0,
+            "0.4": 0,
+            "0.6": 0,
+            "0.8": 0,
+            "1.2": 0
+          }
+        },
+        "amount@effect.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "effect.0.then.0.payload.amount.const",
+          "label": "命中 · 伤害",
+          "group": "固有效果",
+          "unit": "点",
+          "factoryValue": 200,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 7,
+            "25": 6,
+            "30": 6,
+            "50": 5,
+            "200": 0
+          },
+          "raw": {
+            "10": 7,
+            "25": 6,
+            "30": 6,
+            "50": 5,
+            "200": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        },
+        "(兜底)@rules.1.then.0.payload.value.const": {
+          "key": "(兜底)",
+          "path": "rules.1.then.0.payload.value.const",
+          "label": "击杀时 · 改属性 · 冷却",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 0,
+          "values": [
+            -4,
+            -3,
+            0,
+            1
+          ],
+          "points": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          },
+          "raw": {
+            "0": 0,
+            "1": 0,
+            "-4": 0,
+            "-3": 0
+          }
+        },
+        "duration@rules.2.then.0.payload.inline.duration": {
+          "key": "duration",
+          "path": "rules.2.then.0.payload.inline.duration",
+          "label": "命中时 · 挂状态 · 持续",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 5,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          },
+          "raw": {
+            "3": 0,
+            "5": 0,
+            "10": 0,
+            "25": 0,
+            "-1": 0,
+            "0.5": 0,
+            "1.5": 0
+          }
+        },
+        "every@rules.2.then.0.payload.inline.hooks.0.every": {
+          "key": "every",
+          "path": "rules.2.then.0.payload.inline.hooks.0.every",
+          "label": "命中时 · 挂状态 · 每 1 秒 · 间隔",
+          "group": "规则",
+          "unit": "s",
+          "factoryValue": 1,
+          "values": [
+            0.1,
+            0.25,
+            0.5,
+            1,
+            2
+          ],
+          "points": {
+            "1": 0,
+            "2": 1,
+            "0.1": -1,
+            "0.25": -1,
+            "0.5": -1
+          },
+          "raw": {
+            "1": 0,
+            "2": 1,
+            "0.1": -1,
+            "0.25": -1,
+            "0.5": -1
+          }
+        },
+        "amount@rules.2.then.0.payload.inline.hooks.0.then.0.payload.amount.const": {
+          "key": "amount",
+          "path": "rules.2.then.0.payload.inline.hooks.0.then.0.payload.amount.const",
+          "label": "命中时 · 挂状态 · 每 1 秒 · 伤害",
+          "group": "规则",
+          "unit": "点",
+          "factoryValue": 10,
+          "values": [
+            10,
+            25,
+            30,
+            50,
+            200
+          ],
+          "points": {
+            "10": 0,
+            "25": -1,
+            "30": -1,
+            "50": -1,
+            "200": -7
+          },
+          "raw": {
+            "10": 0,
+            "25": -1,
+            "30": -1,
+            "50": -1,
+            "200": -7
+          }
+        }
+      }
+    },
+    "skill.stealth": {
+      "_name": "潜行",
+      "_school": "magic",
+      "_readonly": false,
+      "_leaves": 7,
+      "_rows": 40,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.3,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.3": 0,
+            "0.5": 1
+          }
+        },
+        "energy@phases.0.cost.energy": {
+          "key": "energy",
+          "path": "phases.0.cost.energy",
+          "label": "前摇 · 能量",
+          "group": "代价",
+          "unit": "能量",
+          "factoryValue": 20,
+          "values": [
+            10,
+            20,
+            30,
+            40
+          ],
+          "points": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          },
+          "raw": {
+            "10": -1,
+            "20": 0,
+            "30": 1,
+            "40": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.1,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": 0,
+            "0.2": 1,
+            "0.3": 2,
+            "0.5": 1
+          }
+        },
+        "cooldown@phases.1.cost.cooldown": {
+          "key": "cooldown",
+          "path": "phases.1.cost.cooldown",
+          "label": "后摇 · 冷却",
+          "group": "代价",
+          "unit": "s",
+          "factoryValue": 8,
+          "values": [
+            2,
+            3,
+            8,
+            20
+          ],
+          "points": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          },
+          "raw": {
+            "2": -1,
+            "3": -1,
+            "8": 0,
+            "20": 2
+          }
+        },
+        "(兜底)@effect.0.then.0.payload.value.const": {
+          "key": "(兜底)",
+          "path": "effect.0.then.0.payload.value.const",
+          "label": "前摇 · 感知 · 可见度",
+          "group": "固有效果",
+          "unit": "",
+          "factoryValue": 0,
+          "values": [
+            -4,
+            -3,
+            0,
+            1
+          ],
+          "points": {
+            "0": 0,
+            "1": 3,
+            "-4": 0,
+            "-3": 0
+          },
+          "raw": {
+            "0": 0,
+            "1": 3,
+            "-4": 0,
+            "-3": 0
+          }
+        },
+        "duration@effect.0.then.0.payload.duration": {
+          "key": "duration",
+          "path": "effect.0.then.0.payload.duration",
+          "label": "前摇 · 感知 · 持续",
+          "group": "固有效果",
+          "unit": "s",
+          "factoryValue": 5,
+          "values": [
+            -1,
+            0.5,
+            1.5,
+            3,
+            5,
+            10,
+            25
+          ],
+          "points": {
+            "3": 1,
+            "5": 0,
+            "10": -3,
+            "25": -12,
+            "-1": 4,
+            "0.5": 3,
+            "1.5": 2
+          },
+          "raw": {
+            "3": 1,
+            "5": 0,
+            "10": -3,
+            "25": -12,
+            "-1": 4,
+            "0.5": 3,
+            "1.5": 2
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.ws-slash": {
+      "_name": "横砍",
+      "_school": "weapon",
+      "_readonly": true,
+      "_leaves": 5,
+      "_rows": 33,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.15,
+          "values": [
+            -1,
+            0.1,
+            0.15,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.15": 0,
+            "0.2": 1,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.15": 0,
+            "0.2": 1,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "duration@phases.2.duration": {
+          "key": "duration",
+          "path": "phases.2.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "angle@effect.0.then.0.delivery.angle": {
+          "key": "angle",
+          "path": "effect.0.then.0.delivery.angle",
+          "label": "命中 · 伤害 · 张角",
+          "group": "固有效果",
+          "unit": "°",
+          "factoryValue": 120,
+          "values": [
+            45,
+            90,
+            120,
+            180,
+            360
+          ],
+          "points": {
+            "45": 0,
+            "90": 0,
+            "120": 0,
+            "180": 0,
+            "360": 0
+          },
+          "raw": {
+            "45": 0,
+            "90": 0,
+            "120": 0,
+            "180": 0,
+            "360": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    },
+    "skill.ws-thrust": {
+      "_name": "刺击",
+      "_school": "weapon",
+      "_readonly": true,
+      "_leaves": 5,
+      "_rows": 35,
+      "variables": {
+        "duration@phases.0.duration": {
+          "key": "duration",
+          "path": "phases.0.duration",
+          "label": "前摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.15,
+          "values": [
+            -1,
+            0.1,
+            0.15,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.15": 0,
+            "0.2": 1,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.15": 0,
+            "0.2": 1,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "duration@phases.1.duration": {
+          "key": "duration",
+          "path": "phases.1.duration",
+          "label": "命中 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.2,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 4,
+            "0.1": -1,
+            "0.2": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "duration@phases.2.duration": {
+          "key": "duration",
+          "path": "phases.2.duration",
+          "label": "后摇 · 时长",
+          "group": "阶段",
+          "unit": "s",
+          "factoryValue": 0.25,
+          "values": [
+            -1,
+            0.1,
+            0.2,
+            0.25,
+            0.3,
+            0.5,
+            1
+          ],
+          "points": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.25": 0,
+            "0.3": 1,
+            "0.5": 1
+          },
+          "raw": {
+            "1": 1,
+            "-1": 3,
+            "0.1": -1,
+            "0.2": -1,
+            "0.25": 0,
+            "0.3": 1,
+            "0.5": 1
+          }
+        },
+        "width@effect.0.then.0.delivery.width": {
+          "key": "width",
+          "path": "effect.0.then.0.delivery.width",
+          "label": "命中 · 伤害 · 宽度",
+          "group": "固有效果",
+          "unit": "m",
+          "factoryValue": 0.5,
+          "values": [
+            0.2,
+            0.4,
+            0.5,
+            0.6,
+            0.8,
+            1.2
+          ],
+          "points": {
+            "0.2": 0,
+            "0.4": 0,
+            "0.5": 0,
+            "0.6": 0,
+            "0.8": 0,
+            "1.2": 0
+          },
+          "raw": {
+            "0.2": 0,
+            "0.4": 0,
+            "0.5": 0,
+            "0.6": 0,
+            "0.8": 0,
+            "1.2": 0
+          }
+        },
+        "ruleSlots@ruleSlots": {
+          "key": "ruleSlots",
+          "path": "ruleSlots",
+          "label": "规则位上限",
+          "group": "其他",
+          "unit": "条",
+          "factoryValue": 4,
+          "values": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ],
+          "points": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          },
+          "raw": {
+            "0": 4,
+            "1": 3,
+            "2": 2,
+            "3": 1,
+            "4": 0,
+            "5": -1,
+            "6": -3,
+            "7": -4,
+            "8": -6
+          }
+        }
+      }
+    }
+  }
+}

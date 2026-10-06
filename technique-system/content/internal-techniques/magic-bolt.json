@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "tech.magic-bolt",
+  "name": "魔法飞弹",
+  "activation": "press",
+  "skills": [
+    "skill.magic-bolt"
+  ],
+  "tags": [
+    "远程",
+    "投射物"
+  ],
+  "kind": "magic"
+}

@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.infinity",
+  "name": "无下限",
+  "note": "展开一个常驻的领域：靠近的敌人越近越慢。维持它要一直烧能量，还会压掉你一块能量上限 —— 开着它就别打持久战。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "enemy"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：自我光环，只打敌人（同迟滞场）**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "form": "passive",
+  "_comment_form": "形态 = passive（常驻）：它只有一段占位相（cast —— 没有固有效果，也没有代价），行为全在 onTick / onCast 的反应规则里。\n\n⚠ 它现在**没有被任何术式引用**（技能库里有、示范术式删了，玩家自己拼一份术式装上去才生效）。所以依据是机制本身（没有时间轴），不是\"被 auto 术式用到\"。",
+  "phases": [
+    {
+      "id": "cast",
+      "name": "命中",
+      "duration": 0.3,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "interrupt": "control"
+    }
+  ],
+  "rules": [
+    {
+      "id": "r1",
+      "note": "光环给靠近的敌人减速",
+      "when": "onTick",
+      "every": 0.25,
+      "then": [
+        {
+          "valid": [
+            "enemy"
+          ],
+          "delivery": {
+            "kind": "area",
+            "radius": 6
+          },
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.infinity.slow",
+              "name": "无下限",
+              "tags": [
+                "softCC",
+                "debuff"
+              ],
+              "duration": 0.5,
+              "vfx": "fx.infinity",
+              "removal": {
+                "expires": true
+              },
+              "modifiers": [
+                {
+                  "path": "char.moveScale",
+                  "op": "mul",
+                  "value": {
+                    "ref": "distance",
+                    "curve": [
+                      [
+                        0,
+                        0.2
+                      ],
+                      [
+                        3,
+                        0.6
+                      ],
+                      [
+                        6,
+                        1
+                      ]
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "order": 0
+    },
+    {
+      "id": "r2",
+      "note": "维持它得一直烧能量",
+      "when": "onTick",
+      "every": 0.5,
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "attribute",
+            "path": "char.energy.current",
+            "op": "add",
+            "value": {
+              "const": -4
+            }
+          }
+        }
+      ],
+      "order": 1
+    },
+    {
+      "id": "r3",
+      "note": "透支身体去维持术式",
+      "when": "onCast",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.infinity.drain",
+              "name": "无下限·透支",
+              "tags": [
+                "debuff"
+              ],
+              "duration": -1,
+              "vfx": "fx.infinity-drain",
+              "removal": {
+                "onlyBy": [
+                  "tech.infinity"
+                ],
+                "expires": false
+              },
+              "modifiers": [
+                {
+                  "path": "char.energy.max",
+                  "op": "mul",
+                  "value": {
+                    "const": 0.8
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "order": 2
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "控制",
+    "常驻",
+    "领域"
+  ]
+}

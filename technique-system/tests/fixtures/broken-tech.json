@@ -1,0 +1,10 @@
+{
+  "_comment": "故意写坏的术式：只测 validateTechnique 那几条（激活方式、目标、技能链）。术式本身没有点数，所以这里也不该有 points。",
+
+  "schemaVersion": 1,
+  "id": "tech.broken",
+  "name": "故意写坏的术式",
+  "activation": "doubleClick",
+  "targeting": { "mode": "self", "valid": [] },
+  "skills": []
+}

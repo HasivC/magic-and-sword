@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.charm",
+  "name": "策反",
+  "note": "让目标短时间内把你当队友。它会转头去打原来的同伴，但只是一会儿。被策反的人自己没法反抗。",
+  "targeting": {
+    "mode": "locked",
+    "valid": [
+      "enemy"
+    ],
+    "range": 9
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：贴身才能策反，同亡灵诅咒**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "把敌人的阵营盖掉 —— 它当场变成你的人，帮你打。\n\n玩家点名要的机制（植物大战僵尸的魅惑）。它以前做不出来，因为：\n`EntityDef.faction` **只在 spawn 时定**，之后再没有任何一条路能改它 ——\n而 schema 里那句注释（「魅惑就是改这个字段」）已经写了很久。\n\n现在改的是 `StatusDef.faction`：**挂着就改阵营，到期就还原**。\n选状态而不是「改阵营的动作」，是因为魅惑天生该是**临时**的、\n而且该**能被驱散** —— 做成状态之后这两件事一点额外机制都不用加。",
+  "_comment_caster": "⚠ `faction: 'caster'` 是「跟**挂上这个状态的人**同阵营」。\n\n这条特别重要：同一份技能，玩家放出来敌人变友军，\n敌人放出来玩家变敌军 —— **一份内容两边都对**，不用写两份。\n这就是纪律 1（一切按阵营动态查询）在内容层的兑现。\n\n它在施加的那一刻就解析成具体阵营（见 src/sim/status.ts），\n所以引擎里只有 `factionOf()` 一处读阵营。",
+  "_comment_duration": "⚠ 时长 10 秒：这是**暂时**策反，不是永久叛变。\n永久版把 duration 写 -1 就行 —— 那才是「把它彻底变成你的」（很强，慎用）。",
+  "_comment_target": "⚠ `target: 'hit'` 必须显式写。不写的话，引擎会打锁定目标（对的），\n但定价器会按「给自己上状态」算 —— 方向反了，而这一点上一轮刚修过。",
+  "phases": [
+    {
+      "id": "chant",
+      "name": "前摇",
+      "duration": 0.5,
+      "occupiesCaster": false,
+      "cancellable": true,
+      "cost": {
+        "energy": 30
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "settle",
+      "name": "后摇",
+      "duration": 0.2,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 20
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "chant",
+      "then": [
+        {
+          "target": "hit",
+          "payload": {
+            "kind": "status",
+            "verb": "apply",
+            "inline": {
+              "id": "status.charmed",
+              "name": "策反",
+              "tags": [
+                "debuff",
+                "charm"
+              ],
+              "duration": 10,
+              "faction": "caster",
+              "removal": {
+                "expires": true
+              },
+              "vfx": "fx.charm"
+            }
+          }
+        }
+      ],
+      "note": "让目标短时间内为你所用"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "控制",
+    "策反"
+  ],
+  "rules": []
+}

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "scenario.duel",
+  "name": "一对一：剑士 vs 法师",
+
+  "_comment": "第一个真场景。两边都由 AI 驱动，所以它是无头的、可重放的 —— 同一份场景跑一百次结果完全一样（AI 不用随机数）。",
+
+  "duration": 25,
+
+  "entities": [
+    {
+      "label": "剑士",
+      "faction": "player",
+      "pos": { "x": -6, "y": 0 },
+      "attributes": {
+        "char.hp.max": 300,
+        "char.energy.max": 100,
+        "char.energy.regen": 12,
+        "char.speed": 4.5
+      },
+      "techniques": ["tech.cleave"],
+      "ai": {
+        "targetFaction": "enemyOfSelf",
+        "preferredRange": 1.6,
+        "thinkInterval": 0.25
+      }
+    },
+    {
+      "label": "法师",
+      "faction": "enemy",
+      "pos": { "x": 6, "y": 0 },
+      "attributes": {
+        "char.hp.max": 200,
+        "char.energy.max": 100,
+        "char.energy.regen": 8,
+        "char.speed": 3.5
+      },
+      "techniques": ["tech.charged-laser", "tech.magic-bolt"],
+      "ai": {
+        "targetFaction": "enemyOfSelf",
+        "preferredRange": 7,
+        "thinkInterval": 0.4,
+        "chargeTime": 2
+      }
+    }
+  ]
+}

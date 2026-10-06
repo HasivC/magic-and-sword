@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "id": "skill.raise-dead",
+  "name": "亡灵复生",
+  "note": "从地里召出一具骷髅替你打。它跟着你打完这一场，或者直到被打碎 —— 死了不会自己回来。",
+  "targeting": {
+    "mode": "self",
+    "valid": [
+      "self"
+    ]
+  },
+  "_comment_targeting": "**这个技能自己的瞄准**（2026-09-21 日志 47：\"瞄准搬到技能层\"搬过来的）。\n\n⚠ 搬家前它挂在**判断：在原地召唤**上（术式 / 序列段那一层），\n搬家时逐字搬到这里 —— 所以**行为一个字都没变**。\n\n⚠ 定稿（`docs/sequence-and-modifier-model.md` §六 / §九）：**术式没有瞄准，序列段也没有**，\n瞄准是\"**这个技能怎么解释玩家给的那一个意图**\"，每个技能各自判断（默认鼠标方向）。\n客户端始终只交\"**鼠标位置那一个点**\"这一个意图（方向、落点都从它推出来）——\n自动锁敌 / 对自己的技能直接忽略它，不用按术式去决定收集什么。",
+  "_comment": "`spawn` 载荷唯一的用法 —— 七个载荷里最后一个被实现的。\n在此之前 EntityDef 那个类型是**零引用**的：声明在 schema 里、\n校验器认它、describe 会说「生成 entity.skeleton」，但没有一行代码读它。",
+  "_comment_cheap": "⚠ 这是**廉价版召唤**：只能引用 content/entities/ 里的预设，\n不能现场捏一个。玩家自定义召唤物的 AI 是另一个量级的工程\n（自己写行为、自己配技能组、自己定成长），留给以后。\n\n这条线划在这儿是有意的：它让「召唤骷髅」「狼群」「分身」这一整类技能\n当天就能写出来，代价是召唤物不能长得随心所欲。",
+  "_comment_faction": "预设里 faction 写的是 'caster' —— 跟召唤者同一阵营。\n所以玩家召出来的骷髅帮玩家打，敌人召出来的帮敌人打，**同一份预设**。\n这就是纪律 1（一切按阵营动态查询）在内容层的兑现。",
+  "_comment_lifetime": "lifetime 写 'untilCasterDies' 而不是一个秒数。\n召出来的东西应该跟着你打完这一场，而不是过几秒自己消失 ——\n数值型 lifetime 适合投射物型召唤（图腾、地雷），\n和主人同生共死才是「召唤骷髅」该有的样子。",
+  "_comment_count": "⚠ count 是 1，不是 2 —— 这是**配平算出来的结果**，不是随便写的。\n\n两具 60 血的永久骷髅在账上值 18.4 点，而这个技能能付出的代价上限\n（能量 40 + 冷却 20 + 两段前摇）只有 ~10.5 点。也就是说：\n**两具能打完整场的骷髅，比一个 20 秒冷却的技能能付得起的东西更多**。\n\n当时的直觉是「把骷髅调脆」（改成 30 血），但那是错的 ——\n30 血的召唤物挨一下就没了，那不叫召唤，那叫放个烟花。\n正确的做法是**减数量、保质量**：一具 60 血的骷髅，正好 +1.28 配平。\n\n（`count` 这个字段本身由 tests/scenario.ts 的单元测试覆盖。）",
+  "phases": [
+    {
+      "id": "ritual",
+      "name": "前摇",
+      "duration": 0.5,
+      "occupiesCaster": true,
+      "cancellable": true,
+      "cost": {
+        "energy": 30
+      },
+      "interrupt": "damage"
+    },
+    {
+      "id": "rise",
+      "name": "后摇",
+      "duration": 0.2,
+      "occupiesCaster": false,
+      "cancellable": false,
+      "cost": {
+        "cooldown": 20
+      },
+      "interrupt": "none"
+    }
+  ],
+  "effect": [
+    {
+      "id": "e1",
+      "at": "ritual",
+      "then": [
+        {
+          "target": "self",
+          "payload": {
+            "kind": "spawn",
+            "entityId": "entity.skeleton",
+            "count": 1,
+            "lifetime": "untilCasterDies"
+          }
+        }
+      ],
+      "note": "从地里爬出一具骷髅"
+    }
+  ],
+  "ruleSlots": 4,
+  "tags": [
+    "召唤",
+    "亡灵"
+  ],
+  "rules": []
+}
